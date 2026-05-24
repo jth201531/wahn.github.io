@@ -101,8 +101,8 @@
 
   const artists = [
     {
-      name: 'Artist Name', genre: 'Graphic', works: '— works', color: '#1c1624', display: 'a',
-      adjectives: ['Bold','Structural','Raw','Geometric','Dense','Stark'],
+      name: 'Artist 1', genre: 'Graphic', works: '— works', color: '#1c1624', display: 'a',
+      adjectives: ['Bold'],
       html: `<div class="display-a"><div class="scroll-track" id="track-0">
         <a class="s-card" href="#" style="background:#1a1a2e"><span class="s-card-label">Work 01</span></a>
         <a class="s-card" href="#" style="background:#16213e"><span class="s-card-label">Work 02</span></a>
@@ -113,8 +113,8 @@
       </div><p class="hint">← drag to explore</p></div>`
     },
     {
-      name: 'Artist Name', genre: 'Photography', works: '— works', color: '#12201a', display: 'b',
-      adjectives: ['Quiet','Tender','Vast','Hazy','Still','Distant'],
+      name: 'Artist 2', genre: 'Photography', works: '— works', color: '#12201a', display: 'b',
+      adjectives: ['Quiet'],
       html: `<div class="display-b"><div class="tilt-grid" id="tilt-grid">
         <a class="t-card" href="#" style="background:#d4a5a5"></a>
         <a class="t-card" href="#" style="background:#b8c6db"></a>
@@ -127,8 +127,8 @@
       </div></div>`
     },
     {
-      name: 'Artist Name', genre: 'Illustration', works: '— works', color: '#1a1200', display: 'c',
-      adjectives: ['Soft','Dreamy','Layered','Fluid','Warm','Fragile'],
+      name: 'Artist 3', genre: 'Illustration', works: '— works', color: '#1a1200', display: 'c',
+      adjectives: ['Soft'],
       html: `<div class="display-c"><div class="reveal-grid">
         <a class="r-item" href="#"><div class="r-bg" style="background:#a8d8ea"></div><div class="r-curtain"></div><span class="r-num">01</span></a>
         <a class="r-item" href="#"><div class="r-bg" style="background:#aa96da"></div><div class="r-curtain"></div><span class="r-num">02</span></a>
@@ -143,8 +143,8 @@
       </div></div>`
     },
     {
-      name: 'Artist Name', genre: 'Mixed Media', works: '— works', color: '#1a0a0a', display: 'd',
-      adjectives: ['Visceral','Uncertain','Broken','Honest','Heavy','Bare'],
+      name: 'Artist 4', genre: 'Mixed Media', works: '— works', color: '#1a0a0a', display: 'd',
+      adjectives: ['Visceral'],
       html: `<div class="display-d"><div class="typo-list">
         <a class="t-item" href="#"><span class="t-title">Work Title</span><div class="t-meta"><span class="t-year">2024</span><span class="t-arr">→</span></div></a>
         <a class="t-item" href="#"><span class="t-title">Work Title</span><div class="t-meta"><span class="t-year">2024</span><span class="t-arr">→</span></div></a>
@@ -170,11 +170,11 @@
   ];
 
   const stage = document.getElementById('stage');
-  const adjPool = artists.flatMap(a => a.adjectives);
-
   layouts.forEach((l, i) => {
-    const aIdx = i % artists.length;
-    const a = artists[aIdx];
+    const isSoon = i >= artists.length;
+    const aIdx = isSoon ? null : i;
+    const a = isSoon ? null : artists[i];
+
     const tile = document.createElement('div');
     tile.className = 'tile';
     tile.style.left   = (l.left * W) + 'px';
@@ -182,19 +182,25 @@
     tile.style.width  = (l.w   * W) + 'px';
     tile.style.height = (l.h   * H) + 'px';
 
+    const word      = isSoon ? '미정' : a.adjectives[0];
+    const backName  = isSoon ? 'Soon' : a.name;
+    const backGenre = isSoon ? '' : a.genre;
+    const backIndex = isSoon ? '—' : `0${aIdx + 1}`;
+    const backBg    = isSoon ? '#161616' : a.color;
+
     tile.innerHTML = `
       <div class="tile-inner">
         <div class="tile-front">
-          <span class="tile-front-word">${adjPool[i % adjPool.length]}</span>
+          <span class="tile-front-word">${word}</span>
         </div>
-        <div class="tile-back" style="background:${a.color}">
-          <div class="tile-back-index">0${aIdx+1}</div>
-          <div class="tile-back-name">${a.name}</div>
-          <div class="tile-back-genre">${a.genre}</div>
+        <div class="tile-back" style="background:${backBg}">
+          <div class="tile-back-index">${backIndex}</div>
+          <div class="tile-back-name">${backName}</div>
+          <div class="tile-back-genre">${backGenre}</div>
         </div>
       </div>`;
 
-    tile.addEventListener('click', () => openArtist(aIdx));
+    if (!isSoon) tile.addEventListener('click', () => openArtist(aIdx));
     stage.appendChild(tile);
   });
 
