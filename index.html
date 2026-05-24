@@ -6,7 +6,6 @@
   <title>Wahn</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Editorial+New:ital@0;1&family=Suisse+Int%27l:wght@300;400&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -14,11 +13,9 @@
       --fg: #0e0e0e;
       --muted: #8a8680;
       --border: rgba(14,14,14,0.12);
-      --accent: #0e0e0e;
     }
 
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
     html { font-size: 16px; }
 
     body {
@@ -27,10 +24,10 @@
       font-family: 'DM Sans', sans-serif;
       font-weight: 300;
       min-height: 100vh;
-      cursor: none;
     }
 
-    /* 커스텀 커서 */
+    /* 커스텀 커서 (원만 보이고 기본 커서는 숨김) */
+    * { cursor: none !important; }
     .cursor {
       width: 8px; height: 8px;
       background: var(--fg);
@@ -39,71 +36,59 @@
       top: 0; left: 0;
       pointer-events: none;
       z-index: 9999;
-      transition: transform 0.15s ease, width 0.2s ease, height 0.2s ease;
+      transition: width 0.2s ease, height 0.2s ease, background 0.2s ease;
       transform: translate(-50%, -50%);
     }
     .cursor.hover {
-      width: 40px; height: 40px;
+      width: 36px; height: 36px;
       background: transparent;
       border: 1px solid var(--fg);
     }
 
-    /* 레이아웃 */
-    .site-wrap {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 0 2rem;
-    }
+    .site-wrap { max-width: 960px; margin: 0 auto; padding: 0 2rem; }
 
-    /* 헤더 */
     header {
       padding: 2.5rem 0 2rem;
       display: flex;
       align-items: baseline;
       justify-content: space-between;
       border-bottom: 0.5px solid var(--border);
+      opacity: 0;
+      animation: fadeUp 0.5s ease forwards;
     }
     .logo {
       font-family: 'EB Garamond', serif;
       font-size: 13px;
       letter-spacing: 0.22em;
       text-transform: uppercase;
-      color: var(--fg);
     }
-    .header-right {
-      font-size: 11px;
-      letter-spacing: 0.1em;
-      color: var(--muted);
-      text-transform: uppercase;
-    }
+    .header-right { font-size: 11px; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; }
 
-    /* 메인 */
     main { padding: 0; }
 
-    /* 작가 리스트 */
     .artist-row {
       border-bottom: 0.5px solid var(--border);
       overflow: hidden;
+      opacity: 0;
+      transform: translateY(16px);
+      animation: fadeUp 0.6s ease forwards;
     }
+    .artist-row:nth-child(1) { animation-delay: 0.1s; }
+    .artist-row:nth-child(2) { animation-delay: 0.2s; }
+    .artist-row:nth-child(3) { animation-delay: 0.3s; }
+    .artist-row:nth-child(4) { animation-delay: 0.4s; }
+
+    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
 
     .artist-trigger {
       display: flex;
       align-items: baseline;
       justify-content: space-between;
       padding: 2rem 0;
-      cursor: none;
       gap: 1rem;
     }
-
     .artist-left { display: flex; align-items: baseline; gap: 1.5rem; }
-
-    .artist-index {
-      font-size: 11px;
-      color: var(--muted);
-      letter-spacing: 0.05em;
-      min-width: 24px;
-    }
-
+    .artist-index { font-size: 11px; color: var(--muted); letter-spacing: 0.05em; min-width: 24px; }
     .artist-name {
       font-family: 'EB Garamond', serif;
       font-size: clamp(28px, 5vw, 52px);
@@ -115,198 +100,84 @@
     .artist-row:hover .artist-name { opacity: 0.4; }
     .artist-row.open .artist-name { opacity: 1 !important; }
 
-    .artist-right {
-      display: flex;
-      align-items: center;
-      gap: 2rem;
-    }
-    .artist-genre {
-      font-size: 11px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-    .artist-count {
-      font-size: 11px;
-      color: var(--muted);
-    }
+    .artist-right { display: flex; align-items: center; gap: 2rem; }
+    .artist-genre { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+    .artist-count { font-size: 11px; color: var(--muted); }
     .artist-plus {
-      font-size: 20px;
-      font-weight: 300;
-      color: var(--fg);
+      font-size: 20px; font-weight: 300; color: var(--fg); line-height: 1;
       transition: transform 0.45s cubic-bezier(0.76, 0, 0.24, 1);
-      line-height: 1;
     }
     .artist-row.open .artist-plus { transform: rotate(45deg); }
 
-    /* 패널 */
     .artist-panel {
-      max-height: 0;
-      overflow: hidden;
+      max-height: 0; overflow: hidden;
       transition: max-height 0.65s cubic-bezier(0.76, 0, 0.24, 1);
     }
     .artist-row.open .artist-panel { max-height: 520px; }
     .panel-inner { padding-bottom: 2.5rem; }
 
-    /* ── 전시 타입 A: 수평 드래그 슬라이드 ── */
-    .display-a .scroll-wrap {
-      overflow: hidden;
-      position: relative;
-    }
+    /* A: 수평 드래그 */
     .display-a .scroll-track {
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      scrollbar-width: none;
-      cursor: grab;
-      padding-bottom: 4px;
+      display: flex; gap: 10px; overflow-x: auto;
+      scrollbar-width: none; padding-bottom: 4px;
     }
-    .display-a .scroll-track:active { cursor: grabbing; }
     .display-a .scroll-track::-webkit-scrollbar { display: none; }
     .display-a .s-card {
-      flex: 0 0 200px;
-      height: 260px;
-      border-radius: 2px;
-      text-decoration: none;
-      display: flex;
-      align-items: flex-end;
-      padding: 14px;
-      position: relative;
-      overflow: hidden;
+      flex: 0 0 200px; height: 260px; border-radius: 2px;
+      text-decoration: none; display: flex; align-items: flex-end;
+      padding: 14px; overflow: hidden;
       transition: flex-basis 0.4s ease;
     }
     .display-a .s-card:hover { flex-basis: 280px; }
-    .display-a .s-card-label {
-      font-size: 11px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.7);
-      position: relative;
-      z-index: 1;
-    }
-    .display-a .hint {
-      font-size: 11px;
-      color: var(--muted);
-      margin-top: 10px;
-      letter-spacing: 0.05em;
-    }
+    .display-a .s-card-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.7); }
+    .display-a .hint { font-size: 11px; color: var(--muted); margin-top: 10px; letter-spacing: 0.05em; }
 
-    /* ── 전시 타입 B: 3D 틸트 그리드 ── */
-    .display-b .tilt-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      perspective: 1000px;
-    }
+    /* B: 3D 틸트 */
+    .display-b .tilt-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; perspective: 1000px; }
     .display-b .t-card {
-      aspect-ratio: 3/4;
-      border-radius: 2px;
-      display: block;
-      text-decoration: none;
+      aspect-ratio: 3/4; border-radius: 2px; display: block; text-decoration: none;
       transition: transform 0.1s ease, box-shadow 0.2s ease;
     }
-    .display-b .t-card:hover {
-      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-    }
+    .display-b .t-card:hover { box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
 
-    /* ── 전시 타입 C: 커튼 리빌 ── */
-    .display-c .reveal-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 6px;
-    }
-    .display-c .r-item {
-      aspect-ratio: 2/3;
-      position: relative;
-      overflow: hidden;
-      border-radius: 2px;
-      display: block;
-      text-decoration: none;
-    }
-    .display-c .r-bg {
-      width: 100%; height: 100%;
-      transition: transform 0.7s cubic-bezier(0.76, 0, 0.24, 1);
-    }
+    /* C: 커튼 리빌 */
+    .display-c .reveal-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+    .display-c .r-item { aspect-ratio: 2/3; position: relative; overflow: hidden; border-radius: 2px; display: block; text-decoration: none; }
+    .display-c .r-bg { width: 100%; height: 100%; transition: transform 0.7s cubic-bezier(0.76, 0, 0.24, 1); }
     .display-c .r-item:hover .r-bg { transform: scale(1.08); }
     .display-c .r-curtain {
-      position: absolute;
-      inset: 0;
-      background: var(--bg);
-      transform-origin: top;
-      transition: transform 0.6s cubic-bezier(0.76, 0, 0.24, 1);
+      position: absolute; inset: 0; background: var(--bg);
+      transform-origin: top; transition: transform 0.6s cubic-bezier(0.76, 0, 0.24, 1);
     }
     .display-c .r-item:hover .r-curtain { transform: scaleY(0); }
     .display-c .r-num {
-      position: absolute;
-      bottom: 8px; left: 10px;
-      font-size: 10px;
-      letter-spacing: 0.1em;
-      color: rgba(255,255,255,0.6);
-      opacity: 0;
-      transition: opacity 0.3s 0.35s;
+      position: absolute; bottom: 8px; left: 10px;
+      font-size: 10px; letter-spacing: 0.1em; color: rgba(255,255,255,0.6);
+      opacity: 0; transition: opacity 0.3s 0.35s;
     }
     .display-c .r-item:hover .r-num { opacity: 1; }
 
-    /* ── 전시 타입 D: 타이포그래피 목록 ── */
+    /* D: 타이포 목록 */
     .display-d .typo-list { display: flex; flex-direction: column; }
     .display-d .t-item {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      padding: 1rem 0;
-      border-bottom: 0.5px solid var(--border);
-      text-decoration: none;
-      color: inherit;
+      display: flex; align-items: baseline; justify-content: space-between;
+      padding: 1rem 0; border-bottom: 0.5px solid var(--border);
+      text-decoration: none; color: inherit; gap: 1rem;
       transition: padding-left 0.35s cubic-bezier(0.76, 0, 0.24, 1);
-      gap: 1rem;
     }
     .display-d .t-item:hover { padding-left: 1rem; }
-    .display-d .t-title {
-      font-family: 'EB Garamond', serif;
-      font-size: 22px;
-      font-style: italic;
-      transition: opacity 0.2s;
-    }
+    .display-d .t-title { font-family: 'EB Garamond', serif; font-size: 22px; font-style: italic; transition: opacity 0.2s; }
     .display-d .t-item:hover .t-title { opacity: 0.5; }
-    .display-d .t-meta {
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-    }
+    .display-d .t-meta { display: flex; align-items: center; gap: 1.5rem; }
     .display-d .t-year { font-size: 11px; color: var(--muted); }
     .display-d .t-arr { font-size: 13px; color: var(--muted); opacity: 0; transition: opacity 0.2s; }
     .display-d .t-item:hover .t-arr { opacity: 1; }
 
-    /* 푸터 */
     footer {
-      padding: 2rem 0;
-      border-top: 0.5px solid var(--border);
-      margin-top: 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      padding: 2rem 0; border-top: 0.5px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
     }
     footer p { font-size: 11px; color: var(--muted); letter-spacing: 0.08em; }
-
-    /* 페이지 로드 애니메이션 */
-    .artist-row {
-      opacity: 0;
-      transform: translateY(16px);
-      animation: fadeUp 0.6s ease forwards;
-    }
-    .artist-row:nth-child(1) { animation-delay: 0.1s; }
-    .artist-row:nth-child(2) { animation-delay: 0.2s; }
-    .artist-row:nth-child(3) { animation-delay: 0.3s; }
-    .artist-row:nth-child(4) { animation-delay: 0.4s; }
-
-    @keyframes fadeUp {
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    header {
-      opacity: 0;
-      animation: fadeUp 0.5s ease 0s forwards;
-    }
 
     @media (max-width: 600px) {
       .artist-genre, .artist-count { display: none; }
@@ -327,7 +198,7 @@
 
   <main>
 
-    <!-- ── Artist 1: 수평 드래그 ── -->
+    <!-- Artist 1: 수평 드래그 -->
     <div class="artist-row" id="row-0">
       <div class="artist-trigger" onclick="toggle(0)">
         <div class="artist-left">
@@ -342,22 +213,20 @@
       </div>
       <div class="artist-panel display-a">
         <div class="panel-inner">
-          <div class="scroll-wrap">
-            <div class="scroll-track" id="track-0">
-              <a class="s-card" href="#" style="background:#1a1a2e"><span class="s-card-label">Work 01</span></a>
-              <a class="s-card" href="#" style="background:#16213e"><span class="s-card-label">Work 02</span></a>
-              <a class="s-card" href="#" style="background:#0f3460"><span class="s-card-label">Work 03</span></a>
-              <a class="s-card" href="#" style="background:#2d2d2d"><span class="s-card-label">Work 04</span></a>
-              <a class="s-card" href="#" style="background:#1a1a2e"><span class="s-card-label">Work 05</span></a>
-              <a class="s-card" href="#" style="background:#0f3460"><span class="s-card-label">Work 06</span></a>
-            </div>
+          <div class="scroll-track" id="track-0">
+            <a class="s-card" href="#" style="background:#1a1a2e"><span class="s-card-label">Work 01</span></a>
+            <a class="s-card" href="#" style="background:#16213e"><span class="s-card-label">Work 02</span></a>
+            <a class="s-card" href="#" style="background:#0f3460"><span class="s-card-label">Work 03</span></a>
+            <a class="s-card" href="#" style="background:#2d2d2d"><span class="s-card-label">Work 04</span></a>
+            <a class="s-card" href="#" style="background:#1a1a2e"><span class="s-card-label">Work 05</span></a>
+            <a class="s-card" href="#" style="background:#0f3460"><span class="s-card-label">Work 06</span></a>
           </div>
           <p class="hint">← drag to explore</p>
         </div>
       </div>
     </div>
 
-    <!-- ── Artist 2: 3D 틸트 그리드 ── -->
+    <!-- Artist 2: 3D 틸트 -->
     <div class="artist-row" id="row-1">
       <div class="artist-trigger" onclick="toggle(1)">
         <div class="artist-left">
@@ -386,7 +255,7 @@
       </div>
     </div>
 
-    <!-- ── Artist 3: 커튼 리빌 ── -->
+    <!-- Artist 3: 커튼 리빌 -->
     <div class="artist-row" id="row-2">
       <div class="artist-trigger" onclick="toggle(2)">
         <div class="artist-left">
@@ -417,7 +286,7 @@
       </div>
     </div>
 
-    <!-- ── Artist 4: 타이포 목록 ── -->
+    <!-- Artist 4: 타이포 목록 -->
     <div class="artist-row" id="row-3">
       <div class="artist-trigger" onclick="toggle(3)">
         <div class="artist-left">
@@ -471,14 +340,14 @@
     if (!isOpen) row.classList.add('open');
   }
 
-  // 드래그 스크롤 (Artist 1)
+  // 드래그 스크롤
   const track = document.getElementById('track-0');
   let isDragging = false, startX = 0, scrollLeft = 0;
   track.addEventListener('mousedown', e => { isDragging = true; startX = e.pageX; scrollLeft = track.scrollLeft; });
   document.addEventListener('mousemove', e => { if (!isDragging) return; track.scrollLeft = scrollLeft - (e.pageX - startX); });
   document.addEventListener('mouseup', () => isDragging = false);
 
-  // 3D 틸트 (Artist 2)
+  // 3D 틸트
   const tiltGrid = document.getElementById('tilt-grid');
   if (tiltGrid) {
     tiltGrid.addEventListener('mousemove', e => {
