@@ -103,12 +103,17 @@
       align-items: center;
       justify-content: center;
     }
-    .tile-front-dot {
-      width: 2px; height: 2px;
-      border-radius: 50%;
-      background: var(--muted);
-      opacity: 0.3;
-    }
+    .tile-front-word {
+  font-size: clamp(9px, 0.9vw, 12px);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(240,237,232,0.1);
+  text-align: center;
+  transition: color 0.3s;
+}
+.tile:hover .tile-front-word {
+  color: rgba(240,237,232,0.3);
+}
 
     .tile-back {
       transform: rotateY(180deg);
@@ -290,6 +295,7 @@
     {
       name: 'Artist Name', genre: 'Graphic', works: '— works',
       color: '#1c1624', display: 'a',
+      adjectives: ['Bold', 'Structural', 'Raw', 'Geometric', 'Dense', 'Stark'],
       html: `<div class="display-a">
         <div class="scroll-track" id="track-0">
           <a class="s-card" href="#" style="background:#1a1a2e"><span class="s-card-label">Work 01</span></a>
@@ -305,6 +311,7 @@
     {
       name: 'Artist Name', genre: 'Photography', works: '— works',
       color: '#12201a', display: 'b',
+      adjectives: ['Quiet', 'Tender', 'Vast', 'Hazy', 'Still', 'Distant'],
       html: `<div class="display-b">
         <div class="tilt-grid" id="tilt-grid">
           <a class="t-card" href="#" style="background:#d4a5a5"></a>
@@ -321,6 +328,7 @@
     {
       name: 'Artist Name', genre: 'Illustration', works: '— works',
       color: '#1a1200', display: 'c',
+      adjectives: ['Soft', 'Dreamy', 'Layered', 'Fluid', 'Warm', 'Fragile'],
       html: `<div class="display-c">
         <div class="reveal-grid">
           <a class="r-item" href="#"><div class="r-bg" style="background:#a8d8ea"></div><div class="r-curtain"></div><span class="r-num">01</span></a>
@@ -339,6 +347,7 @@
     {
       name: 'Artist Name', genre: 'Mixed Media', works: '— works',
       color: '#1a0a0a', display: 'd',
+      adjectives: ['Visceral', 'Uncertain', 'Broken', 'Honest', 'Heavy', 'Bare'],
       html: `<div class="display-d">
         <div class="typo-list">
           <a class="t-item" href="#"><span class="t-title">Work Title</span><div class="t-meta"><span class="t-year">2024</span><span class="t-arr">→</span></div></a>
@@ -386,7 +395,7 @@
     tile.innerHTML = `
       <div class="tile-inner">
         <div class="tile-front">
-          <div class="tile-front-dot"></div>
+          <span class="tile-front-word">${a.adjectives[i % a.adjectives.length]}</span>
         </div>
         <div class="tile-back" style="background:${a.color}">
           <div class="tile-back-index">0${aIdx + 1}</div>
