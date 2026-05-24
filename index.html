@@ -66,20 +66,18 @@
       text-transform: uppercase;
     }
 
-    /* 테셀레이션 그리드 */
     #grid {
-  position: fixed;
-  left: 0; right: 0;
-  top: 20vh;
-  bottom: 0;
-  display: grid;
-}
+      position: fixed;
+      left: 0; right: 0;
+      top: 12vh;
+      bottom: 0;
+      display: grid;
+    }
 
-    /* 타일 */
     .tile {
-  perspective: 800px;
-  position: relative;
-}
+      perspective: 800px;
+      position: relative;
+    }
 
     .tile-inner {
       width: 100%; height: 100%;
@@ -106,16 +104,16 @@
       justify-content: center;
     }
     .tile-front-word {
-  font-size: clamp(9px, 0.9vw, 12px);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: rgba(240,237,232,0.85);
-  text-align: center;
-  transition: color 0.3s;
-}
-.tile:hover .tile-front-word {
-  color: rgba(240,237,232,1);
-}
+      font-size: clamp(9px, 0.9vw, 12px);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(240,237,232,0.85);
+      text-align: center;
+      transition: color 0.3s;
+    }
+    .tile:hover .tile-front-word {
+      color: rgba(240,237,232,1);
+    }
 
     .tile-back {
       transform: rotateY(180deg);
@@ -126,7 +124,6 @@
       padding: 16px;
       overflow: hidden;
     }
-
     .tile-back-index {
       font-size: 10px;
       letter-spacing: 0.1em;
@@ -149,7 +146,6 @@
       margin-top: 4px;
     }
 
-    /* 호버 힌트 */
     .hint-bar {
       position: fixed;
       bottom: 2rem;
@@ -166,7 +162,6 @@
     }
     .hint-bar.hidden { opacity: 0; }
 
-    /* 아티스트 페이지 */
     #page-artist {
       position: fixed;
       inset: 0;
@@ -182,7 +177,6 @@
     #page-artist.visible { opacity: 1; transform: translateY(0); pointer-events: all; }
 
     .artist-page-wrap { max-width: 960px; margin: 0 auto; padding: 0 2rem; }
-
     .artist-page-header {
       padding: 2.5rem 0 2rem;
       display: flex; align-items: baseline; justify-content: space-between;
@@ -265,7 +259,6 @@
 <div id="grid"></div>
 <div class="hint-bar" id="hint">Hover to reveal · Click to enter</div>
 
-<!-- 아티스트 페이지 -->
 <div id="page-artist">
   <div class="artist-page-wrap">
     <div class="artist-page-header">
@@ -282,7 +275,6 @@
 </div>
 
 <script>
-  // 커서
   const cursor = document.getElementById('cursor');
   document.addEventListener('mousemove', e => {
     cursor.style.left = e.clientX + 'px';
@@ -362,7 +354,6 @@
     }
   ];
 
-  // 그리드 생성
   const grid = document.getElementById('grid');
   const cols = 5;
   const rows = 2;
@@ -370,18 +361,14 @@
   grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
 
   const totalTiles = cols * rows;
-  // 아티스트별 타일 수 분배
   const tilesPerArtist = Math.floor(totalTiles / artists.length);
 
-  // 셔플된 인덱스 배열 (타일이 섞여 배치되도록)
   const indices = Array.from({length: totalTiles}, (_, i) => i);
-  // Fisher-Yates shuffle
   for (let i = indices.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [indices[i], indices[j]] = [indices[j], indices[i]];
   }
 
-  // 각 타일에 아티스트 배정
   const tileArtist = new Array(totalTiles);
   indices.forEach((tileIdx, order) => {
     const artistIdx = Math.min(Math.floor(order / tilesPerArtist), artists.length - 1);
@@ -389,30 +376,28 @@
   });
 
   for (let i = 0; i < totalTiles; i++) {
-   for (let i = 0; i < totalTiles; i++) {
-  const aIdx = tileArtist[i];
-  const a = artists[aIdx];
-  const tile = document.createElement('div');
-  tile.className = 'tile';
+    const aIdx = tileArtist[i];
+    const a = artists[aIdx];
+    const tile = document.createElement('div');
+    tile.className = 'tile';
 
-  tile.innerHTML = `
-    <div class="tile-inner">
-      <div class="tile-front">
-        <span class="tile-front-word">${a.adjectives[i % a.adjectives.length]}</span>
+    tile.innerHTML = `
+      <div class="tile-inner">
+        <div class="tile-front">
+          <span class="tile-front-word">${a.adjectives[i % a.adjectives.length]}</span>
+        </div>
+        <div class="tile-back" style="background:${a.color}">
+          <div class="tile-back-index">0${aIdx + 1}</div>
+          <div class="tile-back-name">${a.name}</div>
+          <div class="tile-back-genre">${a.genre}</div>
+        </div>
       </div>
-      <div class="tile-back" style="background:${a.color}">
-        <div class="tile-back-index">0${aIdx + 1}</div>
-        <div class="tile-back-name">${a.name}</div>
-        <div class="tile-back-genre">${a.genre}</div>
-      </div>
-    </div>
-  `;
+    `;
 
-  tile.addEventListener('click', () => openArtist(aIdx));
-  grid.appendChild(tile);
-}
+    tile.addEventListener('click', () => openArtist(aIdx));
+    grid.appendChild(tile);
+  }
 
-  // 힌트 숨기기
   let hintHidden = false;
   document.addEventListener('mousemove', () => {
     if (!hintHidden) {
