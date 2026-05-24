@@ -4,240 +4,65 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Wahn</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #0e0e0e;
-      --fg: #f0ede8;
-      --muted: #555250;
-      --border: rgba(240,237,232,0.1);
-    }
-
+    :root { --bg: #0e0e0e; --fg: #f0ede8; --muted: #555250; --border: rgba(240,237,232,0.1); }
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { width: 100%; height: 100%; overflow: hidden; }
-
-    body {
-      background: var(--bg);
-      color: var(--fg);
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 300;
-    }
-
+    body { background: var(--bg); color: var(--fg); font-family: 'DM Sans', sans-serif; font-weight: 300; }
     * { cursor: none !important; }
-    .cursor {
-      width: 8px; height: 8px;
-      background: var(--fg);
-      border-radius: 50%;
-      position: fixed;
-      top: 0; left: 0;
-      pointer-events: none;
-      z-index: 9999;
-      transform: translate(-50%, -50%);
-      transition: width 0.25s ease, height 0.25s ease, background 0.25s ease, border 0.25s ease;
-    }
-    .cursor.hover {
-      width: 48px; height: 48px;
-      background: transparent;
-      border: 1px solid var(--fg);
-    }
-
-    header {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      padding: 2rem 2.5rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      z-index: 50;
-      pointer-events: none;
-    }
-    .logo {
-      font-family: 'EB Garamond', serif;
-      font-size: 13px;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-    }
-    .header-right {
-      font-size: 11px;
-      letter-spacing: 0.1em;
-      color: var(--muted);
-      text-transform: uppercase;
-    }
-
-    #grid {
-      position: fixed;
-      left: 0; right: 0;
-      top: 12vh;
-      bottom: 0;
-      display: grid;
-    }
-
-    .tile {
-      perspective: 800px;
-      position: relative;
-    }
-
-    .tile-inner {
-      width: 100%; height: 100%;
-      position: relative;
-      transform-style: preserve-3d;
-      transition: transform 0.65s cubic-bezier(0.76, 0, 0.24, 1);
-    }
-    .tile:hover .tile-inner {
-      transform: rotateY(180deg);
-    }
-
-    .tile-front, .tile-back {
-      position: absolute;
-      inset: 0;
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
-      border: 1px solid rgba(240,237,232,0.15);
-    }
-
-    .tile-front {
-      background: var(--bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .tile-front-word {
-      font-size: clamp(9px, 0.9vw, 12px);
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: rgba(240,237,232,0.85);
-      text-align: center;
-      transition: color 0.3s;
-    }
-    .tile:hover .tile-front-word {
-      color: rgba(240,237,232,1);
-    }
-
-    .tile-back {
-      transform: rotateY(180deg);
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      justify-content: flex-end;
-      padding: 16px;
-      overflow: hidden;
-    }
-    .tile-back-index {
-      font-size: 10px;
-      letter-spacing: 0.1em;
-      color: rgba(255,255,255,0.45);
-      margin-bottom: 6px;
-    }
-    .tile-back-name {
-      font-family: 'EB Garamond', serif;
-      font-size: clamp(14px, 1.8vw, 22px);
-      font-weight: 400;
-      color: #fff;
-      line-height: 1.1;
-      letter-spacing: -0.02em;
-    }
-    .tile-back-genre {
-      font-size: 10px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.45);
-      margin-top: 4px;
-    }
-
-    .hint-bar {
-      position: fixed;
-      bottom: 2rem;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 10px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--muted);
-      z-index: 50;
-      pointer-events: none;
-      opacity: 1;
-      transition: opacity 0.5s;
-    }
+    .cursor { width: 8px; height: 8px; background: var(--fg); border-radius: 50%; position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: width .25s, height .25s, background .25s; }
+    .cursor.hover { width: 48px; height: 48px; background: transparent; border: 1px solid var(--fg); }
+    header { position: fixed; top: 0; left: 0; right: 0; padding: 2rem 2.5rem; display: flex; justify-content: space-between; align-items: baseline; z-index: 50; pointer-events: none; }
+    .logo { font-family: 'EB Garamond', serif; font-size: 13px; letter-spacing: 0.22em; text-transform: uppercase; }
+    .header-right { font-size: 11px; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; }
+    #stage { position: fixed; inset: 0; }
+    .tile { position: absolute; perspective: 1000px; overflow: hidden; border-radius: 2px; }
+    .tile-inner { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.7s cubic-bezier(0.76,0,0.24,1); }
+    .tile:hover .tile-inner { transform: rotateY(180deg); }
+    .tile-front, .tile-back { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 2px; }
+    .tile-front { background: #141414; border: 1px solid rgba(240,237,232,0.08); display: flex; align-items: center; justify-content: center; }
+    .tile-front-word { font-size: clamp(9px,0.8vw,12px); letter-spacing: 0.16em; text-transform: uppercase; color: rgba(240,237,232,0.2); text-align: center; transition: color 0.3s; padding: 0 12px; }
+    .tile:hover .tile-front-word { color: rgba(240,237,232,0.7); }
+    .tile-back { transform: rotateY(180deg); display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; padding: 20px; overflow: hidden; }
+    .tile-back-index { font-size: 10px; letter-spacing: 0.1em; color: rgba(255,255,255,0.4); margin-bottom: 6px; }
+    .tile-back-name { font-family: 'EB Garamond', serif; font-size: clamp(16px,2vw,28px); font-weight: 400; color: #fff; line-height: 1.1; letter-spacing: -0.02em; }
+    .tile-back-genre { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-top: 5px; }
+    .hint-bar { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); z-index: 50; pointer-events: none; transition: opacity 0.5s; }
     .hint-bar.hidden { opacity: 0; }
-
-    #page-artist {
-      position: fixed;
-      inset: 0;
-      background: var(--bg);
-      z-index: 100;
-      overflow-y: auto;
-      opacity: 0;
-      transform: translateY(32px);
-      pointer-events: none;
-      transition: opacity 0.55s cubic-bezier(0.76, 0, 0.24, 1),
-                  transform 0.55s cubic-bezier(0.76, 0, 0.24, 1);
-    }
+    #page-artist { position: fixed; inset: 0; background: var(--bg); z-index: 100; overflow-y: auto; opacity: 0; transform: translateY(32px); pointer-events: none; transition: opacity 0.55s cubic-bezier(0.76,0,0.24,1), transform 0.55s cubic-bezier(0.76,0,0.24,1); }
     #page-artist.visible { opacity: 1; transform: translateY(0); pointer-events: all; }
-
     .artist-page-wrap { max-width: 960px; margin: 0 auto; padding: 0 2rem; }
-    .artist-page-header {
-      padding: 2.5rem 0 2rem;
-      display: flex; align-items: baseline; justify-content: space-between;
-      border-bottom: 0.5px solid var(--border);
-    }
-    .back-btn {
-      font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
-      color: var(--muted); transition: color 0.2s;
-      display: flex; align-items: center; gap: 6px;
-    }
+    .artist-page-header { padding: 2.5rem 0 2rem; display: flex; align-items: baseline; justify-content: space-between; border-bottom: 0.5px solid var(--border); }
+    .back-btn { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); transition: color 0.2s; display: flex; align-items: center; gap: 6px; }
     .back-btn:hover { color: var(--fg); }
     .back-arr { transition: transform 0.3s; display: inline-block; }
     .back-btn:hover .back-arr { transform: translateX(-4px); }
-
-    .artist-page-title {
-      font-family: 'EB Garamond', serif;
-      font-size: clamp(36px, 7vw, 80px);
-      font-weight: 400; letter-spacing: -0.03em; line-height: 1;
-      padding: 3rem 0 2rem;
-      opacity: 0; transform: translateY(20px);
-      transition: opacity 0.5s ease 0.1s, transform 0.5s ease 0.1s;
-    }
+    .artist-page-title { font-family: 'EB Garamond', serif; font-size: clamp(36px,7vw,80px); font-weight: 400; letter-spacing: -0.03em; line-height: 1; padding: 3rem 0 2rem; opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease 0.1s, transform 0.5s ease 0.1s; }
     #page-artist.visible .artist-page-title { opacity: 1; transform: translateY(0); }
-
-    .artist-page-meta {
-      font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--muted); padding-bottom: 2.5rem;
-      border-bottom: 0.5px solid var(--border);
-      opacity: 0; transition: opacity 0.5s ease 0.2s;
-    }
+    .artist-page-meta { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); padding-bottom: 2.5rem; border-bottom: 0.5px solid var(--border); opacity: 0; transition: opacity 0.5s ease 0.2s; }
     #page-artist.visible .artist-page-meta { opacity: 1; }
-
-    .artist-page-works {
-      padding: 2rem 0;
-      opacity: 0; transform: translateY(16px);
-      transition: opacity 0.5s ease 0.3s, transform 0.5s ease 0.3s;
-    }
+    .artist-page-works { padding: 2rem 0; opacity: 0; transform: translateY(16px); transition: opacity 0.5s ease 0.3s, transform 0.5s ease 0.3s; }
     #page-artist.visible .artist-page-works { opacity: 1; transform: translateY(0); }
-
     .display-a .scroll-track { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; }
     .display-a .scroll-track::-webkit-scrollbar { display: none; }
     .display-a .s-card { flex: 0 0 200px; height: 280px; border-radius: 2px; text-decoration: none; display: flex; align-items: flex-end; padding: 14px; transition: flex-basis 0.4s ease; }
     .display-a .s-card:hover { flex-basis: 300px; }
     .display-a .s-card-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.6); }
     .display-a .hint { font-size: 11px; color: var(--muted); margin-top: 10px; }
-
-    .display-b .tilt-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .display-b .tilt-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
     .display-b .t-card { aspect-ratio: 3/4; border-radius: 2px; display: block; text-decoration: none; transition: transform 0.1s ease, box-shadow 0.2s ease; }
     .display-b .t-card:hover { box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
-
-    .display-c .reveal-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+    .display-c .reveal-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 6px; }
     .display-c .r-item { aspect-ratio: 2/3; position: relative; overflow: hidden; border-radius: 2px; display: block; text-decoration: none; }
-    .display-c .r-bg { width: 100%; height: 100%; transition: transform 0.7s cubic-bezier(0.76, 0, 0.24, 1); }
+    .display-c .r-bg { width: 100%; height: 100%; transition: transform 0.7s cubic-bezier(0.76,0,0.24,1); }
     .display-c .r-item:hover .r-bg { transform: scale(1.08); }
-    .display-c .r-curtain { position: absolute; inset: 0; background: var(--bg); transform-origin: top; transition: transform 0.6s cubic-bezier(0.76, 0, 0.24, 1); }
+    .display-c .r-curtain { position: absolute; inset: 0; background: var(--bg); transform-origin: top; transition: transform 0.6s cubic-bezier(0.76,0,0.24,1); }
     .display-c .r-item:hover .r-curtain { transform: scaleY(0); }
     .display-c .r-num { position: absolute; bottom: 8px; left: 10px; font-size: 10px; letter-spacing: 0.1em; color: rgba(255,255,255,0.5); opacity: 0; transition: opacity 0.3s 0.35s; }
     .display-c .r-item:hover .r-num { opacity: 1; }
-
     .display-d .typo-list { display: flex; flex-direction: column; }
-    .display-d .t-item { display: flex; align-items: baseline; justify-content: space-between; padding: 1.2rem 0; border-bottom: 0.5px solid var(--border); text-decoration: none; color: inherit; gap: 1rem; transition: padding-left 0.35s cubic-bezier(0.76, 0, 0.24, 1); }
+    .display-d .t-item { display: flex; align-items: baseline; justify-content: space-between; padding: 1.2rem 0; border-bottom: 0.5px solid var(--border); text-decoration: none; color: inherit; gap: 1rem; transition: padding-left 0.35s cubic-bezier(0.76,0,0.24,1); }
     .display-d .t-item:hover { padding-left: 1rem; }
     .display-d .t-title { font-family: 'EB Garamond', serif; font-size: 26px; font-style: italic; transition: opacity 0.2s; }
     .display-d .t-item:hover .t-title { opacity: 0.4; }
@@ -248,24 +73,17 @@
   </style>
 </head>
 <body>
-
 <div class="cursor" id="cursor"></div>
-
 <header>
   <span class="logo">Wahn</span>
   <span class="header-right">Archive</span>
 </header>
-
-<div id="grid"></div>
+<div id="stage"></div>
 <div class="hint-bar" id="hint">Hover to reveal · Click to enter</div>
-
 <div id="page-artist">
   <div class="artist-page-wrap">
     <div class="artist-page-header">
-      <div class="back-btn" onclick="closeArtist()">
-        <span class="back-arr">←</span>
-        <span>Back</span>
-      </div>
+      <div class="back-btn" onclick="closeArtist()"><span class="back-arr">←</span><span>Back</span></div>
       <span class="logo">Wahn</span>
     </div>
     <div class="artist-page-title" id="artist-title"></div>
@@ -273,13 +91,9 @@
     <div class="artist-page-works" id="artist-works"></div>
   </div>
 </div>
-
 <script>
   const cursor = document.getElementById('cursor');
-  document.addEventListener('mousemove', e => {
-    cursor.style.left = e.clientX + 'px';
-    cursor.style.top = e.clientY + 'px';
-  });
+  document.addEventListener('mousemove', e => { cursor.style.left = e.clientX+'px'; cursor.style.top = e.clientY+'px'; });
   document.addEventListener('mouseover', e => {
     if (e.target.closest('.tile, .back-btn')) cursor.classList.add('hover');
     else cursor.classList.remove('hover');
@@ -287,123 +101,106 @@
 
   const artists = [
     {
-      name: 'Artist Name', genre: 'Graphic', works: '— works',
-      color: '#1c1624', display: 'a',
-      adjectives: ['Bold', 'Structural', 'Raw', 'Geometric', 'Dense', 'Stark'],
-      html: `<div class="display-a">
-        <div class="scroll-track" id="track-0">
-          <a class="s-card" href="#" style="background:#1a1a2e"><span class="s-card-label">Work 01</span></a>
-          <a class="s-card" href="#" style="background:#16213e"><span class="s-card-label">Work 02</span></a>
-          <a class="s-card" href="#" style="background:#0f3460"><span class="s-card-label">Work 03</span></a>
-          <a class="s-card" href="#" style="background:#2d2d2d"><span class="s-card-label">Work 04</span></a>
-          <a class="s-card" href="#" style="background:#1a1a2e"><span class="s-card-label">Work 05</span></a>
-          <a class="s-card" href="#" style="background:#0f3460"><span class="s-card-label">Work 06</span></a>
-        </div>
-        <p class="hint">← drag to explore</p>
-      </div>`
+      name: 'Artist Name', genre: 'Graphic', works: '— works', color: '#1c1624', display: 'a',
+      adjectives: ['Bold','Structural','Raw','Geometric','Dense','Stark'],
+      html: `<div class="display-a"><div class="scroll-track" id="track-0">
+        <a class="s-card" href="#" style="background:#1a1a2e"><span class="s-card-label">Work 01</span></a>
+        <a class="s-card" href="#" style="background:#16213e"><span class="s-card-label">Work 02</span></a>
+        <a class="s-card" href="#" style="background:#0f3460"><span class="s-card-label">Work 03</span></a>
+        <a class="s-card" href="#" style="background:#2d2d2d"><span class="s-card-label">Work 04</span></a>
+        <a class="s-card" href="#" style="background:#1a1a2e"><span class="s-card-label">Work 05</span></a>
+        <a class="s-card" href="#" style="background:#0f3460"><span class="s-card-label">Work 06</span></a>
+      </div><p class="hint">← drag to explore</p></div>`
     },
     {
-      name: 'Artist Name', genre: 'Photography', works: '— works',
-      color: '#12201a', display: 'b',
-      adjectives: ['Quiet', 'Tender', 'Vast', 'Hazy', 'Still', 'Distant'],
-      html: `<div class="display-b">
-        <div class="tilt-grid" id="tilt-grid">
-          <a class="t-card" href="#" style="background:#d4a5a5"></a>
-          <a class="t-card" href="#" style="background:#b8c6db"></a>
-          <a class="t-card" href="#" style="background:#a8c5da"></a>
-          <a class="t-card" href="#" style="background:#c9b8a8"></a>
-          <a class="t-card" href="#" style="background:#d8e4bc"></a>
-          <a class="t-card" href="#" style="background:#e8d5c4"></a>
-          <a class="t-card" href="#" style="background:#b5c9d4"></a>
-          <a class="t-card" href="#" style="background:#dcd3c9"></a>
-        </div>
-      </div>`
+      name: 'Artist Name', genre: 'Photography', works: '— works', color: '#12201a', display: 'b',
+      adjectives: ['Quiet','Tender','Vast','Hazy','Still','Distant'],
+      html: `<div class="display-b"><div class="tilt-grid" id="tilt-grid">
+        <a class="t-card" href="#" style="background:#d4a5a5"></a>
+        <a class="t-card" href="#" style="background:#b8c6db"></a>
+        <a class="t-card" href="#" style="background:#a8c5da"></a>
+        <a class="t-card" href="#" style="background:#c9b8a8"></a>
+        <a class="t-card" href="#" style="background:#d8e4bc"></a>
+        <a class="t-card" href="#" style="background:#e8d5c4"></a>
+        <a class="t-card" href="#" style="background:#b5c9d4"></a>
+        <a class="t-card" href="#" style="background:#dcd3c9"></a>
+      </div></div>`
     },
     {
-      name: 'Artist Name', genre: 'Illustration', works: '— works',
-      color: '#1a1200', display: 'c',
-      adjectives: ['Soft', 'Dreamy', 'Layered', 'Fluid', 'Warm', 'Fragile'],
-      html: `<div class="display-c">
-        <div class="reveal-grid">
-          <a class="r-item" href="#"><div class="r-bg" style="background:#a8d8ea"></div><div class="r-curtain"></div><span class="r-num">01</span></a>
-          <a class="r-item" href="#"><div class="r-bg" style="background:#aa96da"></div><div class="r-curtain"></div><span class="r-num">02</span></a>
-          <a class="r-item" href="#"><div class="r-bg" style="background:#fcbad3"></div><div class="r-curtain"></div><span class="r-num">03</span></a>
-          <a class="r-item" href="#"><div class="r-bg" style="background:#ffffd2"></div><div class="r-curtain"></div><span class="r-num">04</span></a>
-          <a class="r-item" href="#"><div class="r-bg" style="background:#a8d8ea"></div><div class="r-curtain"></div><span class="r-num">05</span></a>
-          <a class="r-item" href="#"><div class="r-bg" style="background:#aa96da"></div><div class="r-curtain"></div><span class="r-num">06</span></a>
-          <a class="r-item" href="#"><div class="r-bg" style="background:#fcbad3"></div><div class="r-curtain"></div><span class="r-num">07</span></a>
-          <a class="r-item" href="#"><div class="r-bg" style="background:#ffffd2"></div><div class="r-curtain"></div><span class="r-num">08</span></a>
-          <a class="r-item" href="#"><div class="r-bg" style="background:#a8d8ea"></div><div class="r-curtain"></div><span class="r-num">09</span></a>
-          <a class="r-item" href="#"><div class="r-bg" style="background:#aa96da"></div><div class="r-curtain"></div><span class="r-num">10</span></a>
-        </div>
-      </div>`
+      name: 'Artist Name', genre: 'Illustration', works: '— works', color: '#1a1200', display: 'c',
+      adjectives: ['Soft','Dreamy','Layered','Fluid','Warm','Fragile'],
+      html: `<div class="display-c"><div class="reveal-grid">
+        <a class="r-item" href="#"><div class="r-bg" style="background:#a8d8ea"></div><div class="r-curtain"></div><span class="r-num">01</span></a>
+        <a class="r-item" href="#"><div class="r-bg" style="background:#aa96da"></div><div class="r-curtain"></div><span class="r-num">02</span></a>
+        <a class="r-item" href="#"><div class="r-bg" style="background:#fcbad3"></div><div class="r-curtain"></div><span class="r-num">03</span></a>
+        <a class="r-item" href="#"><div class="r-bg" style="background:#ffffd2"></div><div class="r-curtain"></div><span class="r-num">04</span></a>
+        <a class="r-item" href="#"><div class="r-bg" style="background:#a8d8ea"></div><div class="r-curtain"></div><span class="r-num">05</span></a>
+        <a class="r-item" href="#"><div class="r-bg" style="background:#aa96da"></div><div class="r-curtain"></div><span class="r-num">06</span></a>
+        <a class="r-item" href="#"><div class="r-bg" style="background:#fcbad3"></div><div class="r-curtain"></div><span class="r-num">07</span></a>
+        <a class="r-item" href="#"><div class="r-bg" style="background:#ffffd2"></div><div class="r-curtain"></div><span class="r-num">08</span></a>
+        <a class="r-item" href="#"><div class="r-bg" style="background:#a8d8ea"></div><div class="r-curtain"></div><span class="r-num">09</span></a>
+        <a class="r-item" href="#"><div class="r-bg" style="background:#aa96da"></div><div class="r-curtain"></div><span class="r-num">10</span></a>
+      </div></div>`
     },
     {
-      name: 'Artist Name', genre: 'Mixed Media', works: '— works',
-      color: '#1a0a0a', display: 'd',
-      adjectives: ['Visceral', 'Uncertain', 'Broken', 'Honest', 'Heavy', 'Bare'],
-      html: `<div class="display-d">
-        <div class="typo-list">
-          <a class="t-item" href="#"><span class="t-title">Work Title</span><div class="t-meta"><span class="t-year">2024</span><span class="t-arr">→</span></div></a>
-          <a class="t-item" href="#"><span class="t-title">Work Title</span><div class="t-meta"><span class="t-year">2024</span><span class="t-arr">→</span></div></a>
-          <a class="t-item" href="#"><span class="t-title">Work Title</span><div class="t-meta"><span class="t-year">2023</span><span class="t-arr">→</span></div></a>
-          <a class="t-item" href="#"><span class="t-title">Work Title</span><div class="t-meta"><span class="t-year">2023</span><span class="t-arr">→</span></div></a>
-          <a class="t-item" href="#"><span class="t-title">Work Title</span><div class="t-meta"><span class="t-year">2022</span><span class="t-arr">→</span></div></a>
-        </div>
-      </div>`
+      name: 'Artist Name', genre: 'Mixed Media', works: '— works', color: '#1a0a0a', display: 'd',
+      adjectives: ['Visceral','Uncertain','Broken','Honest','Heavy','Bare'],
+      html: `<div class="display-d"><div class="typo-list">
+        <a class="t-item" href="#"><span class="t-title">Work Title</span><div class="t-meta"><span class="t-year">2024</span><span class="t-arr">→</span></div></a>
+        <a class="t-item" href="#"><span class="t-title">Work Title</span><div class="t-meta"><span class="t-year">2024</span><span class="t-arr">→</span></div></a>
+        <a class="t-item" href="#"><span class="t-title">Work Title</span><div class="t-meta"><span class="t-year">2023</span><span class="t-arr">→</span></div></a>
+        <a class="t-item" href="#"><span class="t-title">Work Title</span><div class="t-meta"><span class="t-year">2023</span><span class="t-arr">→</span></div></a>
+        <a class="t-item" href="#"><span class="t-title">Work Title</span><div class="t-meta"><span class="t-year">2022</span><span class="t-arr">→</span></div></a>
+      </div></div>`
     }
   ];
 
-  const grid = document.getElementById('grid');
-  const cols = 5;
-  const rows = 2;
-  grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-  grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+  // 타일 레이아웃 — 절대위치로 크기/위치 각각 지정 (사진처럼 자유롭게)
+  const W = window.innerWidth;
+  const H = window.innerHeight;
+  const layouts = [
+    { left: 0.03, top: 0.12, w: 0.22, h: 0.42 },
+    { left: 0.27, top: 0.08, w: 0.30, h: 0.55 },
+    { left: 0.60, top: 0.10, w: 0.18, h: 0.30 },
+    { left: 0.80, top: 0.06, w: 0.17, h: 0.50 },
+    { left: 0.04, top: 0.58, w: 0.16, h: 0.34 },
+    { left: 0.22, top: 0.67, w: 0.24, h: 0.28 },
+    { left: 0.49, top: 0.62, w: 0.14, h: 0.22 },
+    { left: 0.65, top: 0.55, w: 0.20, h: 0.38 },
+  ];
 
-  const totalTiles = cols * rows;
-  const tilesPerArtist = Math.floor(totalTiles / artists.length);
+  const stage = document.getElementById('stage');
+  const adjPool = artists.flatMap(a => a.adjectives);
 
-  const indices = Array.from({length: totalTiles}, (_, i) => i);
-  for (let i = indices.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [indices[i], indices[j]] = [indices[j], indices[i]];
-  }
-
-  const tileArtist = new Array(totalTiles);
-  indices.forEach((tileIdx, order) => {
-    const artistIdx = Math.min(Math.floor(order / tilesPerArtist), artists.length - 1);
-    tileArtist[tileIdx] = artistIdx;
-  });
-
-  for (let i = 0; i < totalTiles; i++) {
-    const aIdx = tileArtist[i];
+  layouts.forEach((l, i) => {
+    const aIdx = i % artists.length;
     const a = artists[aIdx];
     const tile = document.createElement('div');
     tile.className = 'tile';
+    tile.style.left   = (l.left * W) + 'px';
+    tile.style.top    = (l.top  * H) + 'px';
+    tile.style.width  = (l.w   * W) + 'px';
+    tile.style.height = (l.h   * H) + 'px';
 
     tile.innerHTML = `
       <div class="tile-inner">
         <div class="tile-front">
-          <span class="tile-front-word">${a.adjectives[i % a.adjectives.length]}</span>
+          <span class="tile-front-word">${adjPool[i % adjPool.length]}</span>
         </div>
         <div class="tile-back" style="background:${a.color}">
-          <div class="tile-back-index">0${aIdx + 1}</div>
+          <div class="tile-back-index">0${aIdx+1}</div>
           <div class="tile-back-name">${a.name}</div>
           <div class="tile-back-genre">${a.genre}</div>
         </div>
-      </div>
-    `;
+      </div>`;
 
     tile.addEventListener('click', () => openArtist(aIdx));
-    grid.appendChild(tile);
-  }
+    stage.appendChild(tile);
+  });
 
   let hintHidden = false;
   document.addEventListener('mousemove', () => {
-    if (!hintHidden) {
-      hintHidden = true;
-      document.getElementById('hint').classList.add('hidden');
-    }
+    if (!hintHidden) { hintHidden = true; document.getElementById('hint').classList.add('hidden'); }
   }, { once: true });
 
   function openArtist(i) {
@@ -417,34 +214,30 @@
     if (a.display === 'a') initDrag();
   }
 
-  function closeArtist() {
-    document.getElementById('page-artist').classList.remove('visible');
-  }
+  function closeArtist() { document.getElementById('page-artist').classList.remove('visible'); }
 
   function initDrag() {
     const track = document.getElementById('track-0');
     if (!track) return;
     let isDragging = false, startX = 0, sl = 0;
     track.addEventListener('mousedown', e => { isDragging = true; startX = e.pageX; sl = track.scrollLeft; });
-    document.addEventListener('mousemove', e => { if (!isDragging) return; track.scrollLeft = sl - (e.pageX - startX); });
+    document.addEventListener('mousemove', e => { if (!isDragging) return; track.scrollLeft = sl-(e.pageX-startX); });
     document.addEventListener('mouseup', () => isDragging = false);
   }
 
   function initTilt() {
     setTimeout(() => {
-      const grid = document.getElementById('tilt-grid');
-      if (!grid) return;
-      grid.addEventListener('mousemove', e => {
-        grid.querySelectorAll('.t-card').forEach(card => {
-          const rect = card.getBoundingClientRect();
-          const dx = (e.clientX - rect.left - rect.width / 2) / rect.width * 18;
-          const dy = (e.clientY - rect.top - rect.height / 2) / rect.height * 18;
+      const g = document.getElementById('tilt-grid');
+      if (!g) return;
+      g.addEventListener('mousemove', e => {
+        g.querySelectorAll('.t-card').forEach(card => {
+          const r = card.getBoundingClientRect();
+          const dx = (e.clientX-r.left-r.width/2)/r.width*18;
+          const dy = (e.clientY-r.top-r.height/2)/r.height*18;
           card.style.transform = `perspective(600px) rotateY(${dx}deg) rotateX(${-dy}deg) scale(1.05)`;
         });
       });
-      grid.addEventListener('mouseleave', () => {
-        grid.querySelectorAll('.t-card').forEach(c => c.style.transform = '');
-      });
+      g.addEventListener('mouseleave', () => g.querySelectorAll('.t-card').forEach(c => c.style.transform = ''));
     }, 100);
   }
 </script>
