@@ -9,11 +9,11 @@
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
   <style>
     :root {
-  --bg: #0e0e0e;
-  --fg: #f0ede8;
-  --muted: #555250;
-  --border: rgba(240,237,232,0.1);
-}
+      --bg: #0e0e0e;
+      --fg: #f0ede8;
+      --muted: #555250;
+      --border: rgba(240,237,232,0.1);
+    }
 
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     html { font-size: 16px; }
@@ -24,9 +24,9 @@
       font-family: 'DM Sans', sans-serif;
       font-weight: 300;
       min-height: 100vh;
+      overflow-x: hidden;
     }
 
-    /* 커스텀 커서 (원만 보이고 기본 커서는 숨김) */
     * { cursor: none !important; }
     .cursor {
       width: 8px; height: 8px;
@@ -47,6 +47,12 @@
 
     .site-wrap { max-width: 960px; margin: 0 auto; padding: 0 2rem; }
 
+    /* ── 메인 페이지 ── */
+    #page-main {
+      transition: opacity 0.5s ease;
+    }
+    #page-main.hidden { opacity: 0; pointer-events: none; }
+
     header {
       padding: 2.5rem 0 2rem;
       display: flex;
@@ -64,11 +70,8 @@
     }
     .header-right { font-size: 11px; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; }
 
-    main { padding: 0; }
-
     .artist-row {
       border-bottom: 0.5px solid var(--border);
-      overflow: hidden;
       opacity: 0;
       transform: translateY(16px);
       animation: fadeUp 0.6s ease forwards;
@@ -97,24 +100,97 @@
       line-height: 1;
       transition: opacity 0.3s ease;
     }
-    .artist-row:hover .artist-name { opacity: 0.4; }
-    .artist-row.open .artist-name { opacity: 1 !important; }
-
+    .artist-row:hover .artist-name { opacity: 0.35; }
     .artist-right { display: flex; align-items: center; gap: 2rem; }
     .artist-genre { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
     .artist-count { font-size: 11px; color: var(--muted); }
-    .artist-plus {
-      font-size: 20px; font-weight: 300; color: var(--fg); line-height: 1;
-      transition: transform 0.45s cubic-bezier(0.76, 0, 0.24, 1);
+    .artist-arr {
+      font-size: 16px; color: var(--muted); line-height: 1;
+      transition: transform 0.3s ease, color 0.3s ease;
     }
-    .artist-row.open .artist-plus { transform: rotate(45deg); }
+    .artist-row:hover .artist-arr { transform: translateX(4px); color: var(--fg); }
 
-    .artist-panel {
-      max-height: 0; overflow: hidden;
-      transition: max-height 0.65s cubic-bezier(0.76, 0, 0.24, 1);
+    footer {
+      padding: 2rem 0; border-top: 0.5px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 0;
     }
-    .artist-row.open .artist-panel { max-height: 520px; }
-    .panel-inner { padding-bottom: 2.5rem; }
+    footer p { font-size: 11px; color: var(--muted); letter-spacing: 0.08em; }
+
+    /* ── 아티스트 페이지 오버레이 ── */
+    #page-artist {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 100;
+      overflow-y: auto;
+      opacity: 0;
+      transform: translateY(40px);
+      pointer-events: none;
+      transition: opacity 0.55s cubic-bezier(0.76, 0, 0.24, 1),
+                  transform 0.55s cubic-bezier(0.76, 0, 0.24, 1);
+    }
+    #page-artist.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: all;
+    }
+
+    .artist-page-wrap { max-width: 960px; margin: 0 auto; padding: 0 2rem; }
+
+    .artist-page-header {
+      padding: 2.5rem 0 2rem;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .back-btn {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      transition: color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .back-btn:hover { color: var(--fg); }
+    .back-arr { transition: transform 0.3s ease; }
+    .back-btn:hover .back-arr { transform: translateX(-4px); }
+
+    .artist-page-title {
+      font-family: 'EB Garamond', serif;
+      font-size: clamp(36px, 7vw, 80px);
+      font-weight: 400;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      padding: 3rem 0 2rem;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease 0.1s, transform 0.5s ease 0.1s;
+    }
+    #page-artist.visible .artist-page-title { opacity: 1; transform: translateY(0); }
+
+    .artist-page-meta {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding-bottom: 2.5rem;
+      border-bottom: 0.5px solid var(--border);
+      opacity: 0;
+      transition: opacity 0.5s ease 0.2s;
+    }
+    #page-artist.visible .artist-page-meta { opacity: 1; }
+
+    .artist-page-works {
+      padding: 2rem 0;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.5s ease 0.3s, transform 0.5s ease 0.3s;
+    }
+    #page-artist.visible .artist-page-works { opacity: 1; transform: translateY(0); }
 
     /* A: 수평 드래그 */
     .display-a .scroll-track {
@@ -123,22 +199,22 @@
     }
     .display-a .scroll-track::-webkit-scrollbar { display: none; }
     .display-a .s-card {
-      flex: 0 0 200px; height: 260px; border-radius: 2px;
+      flex: 0 0 200px; height: 280px; border-radius: 2px;
       text-decoration: none; display: flex; align-items: flex-end;
       padding: 14px; overflow: hidden;
       transition: flex-basis 0.4s ease;
     }
-    .display-a .s-card:hover { flex-basis: 280px; }
-    .display-a .s-card-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.7); }
+    .display-a .s-card:hover { flex-basis: 300px; }
+    .display-a .s-card-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.6); }
     .display-a .hint { font-size: 11px; color: var(--muted); margin-top: 10px; letter-spacing: 0.05em; }
 
     /* B: 3D 틸트 */
-    .display-b .tilt-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; perspective: 1000px; }
+    .display-b .tilt-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
     .display-b .t-card {
       aspect-ratio: 3/4; border-radius: 2px; display: block; text-decoration: none;
       transition: transform 0.1s ease, box-shadow 0.2s ease;
     }
-    .display-b .t-card:hover { box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
+    .display-b .t-card:hover { box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
 
     /* C: 커튼 리빌 */
     .display-c .reveal-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
@@ -152,7 +228,7 @@
     .display-c .r-item:hover .r-curtain { transform: scaleY(0); }
     .display-c .r-num {
       position: absolute; bottom: 8px; left: 10px;
-      font-size: 10px; letter-spacing: 0.1em; color: rgba(255,255,255,0.6);
+      font-size: 10px; letter-spacing: 0.1em; color: rgba(255,255,255,0.5);
       opacity: 0; transition: opacity 0.3s 0.35s;
     }
     .display-c .r-item:hover .r-num { opacity: 1; }
@@ -161,23 +237,17 @@
     .display-d .typo-list { display: flex; flex-direction: column; }
     .display-d .t-item {
       display: flex; align-items: baseline; justify-content: space-between;
-      padding: 1rem 0; border-bottom: 0.5px solid var(--border);
+      padding: 1.2rem 0; border-bottom: 0.5px solid var(--border);
       text-decoration: none; color: inherit; gap: 1rem;
       transition: padding-left 0.35s cubic-bezier(0.76, 0, 0.24, 1);
     }
     .display-d .t-item:hover { padding-left: 1rem; }
-    .display-d .t-title { font-family: 'EB Garamond', serif; font-size: 22px; font-style: italic; transition: opacity 0.2s; }
-    .display-d .t-item:hover .t-title { opacity: 0.5; }
+    .display-d .t-title { font-family: 'EB Garamond', serif; font-size: 26px; font-style: italic; transition: opacity 0.2s; }
+    .display-d .t-item:hover .t-title { opacity: 0.4; }
     .display-d .t-meta { display: flex; align-items: center; gap: 1.5rem; }
     .display-d .t-year { font-size: 11px; color: var(--muted); }
     .display-d .t-arr { font-size: 13px; color: var(--muted); opacity: 0; transition: opacity 0.2s; }
     .display-d .t-item:hover .t-arr { opacity: 1; }
-
-    footer {
-      padding: 2rem 0; border-top: 0.5px solid var(--border);
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    footer p { font-size: 11px; color: var(--muted); letter-spacing: 0.08em; }
 
     @media (max-width: 600px) {
       .artist-genre, .artist-count { display: none; }
@@ -190,29 +260,111 @@
 
 <div class="cursor" id="cursor"></div>
 
-<div class="site-wrap">
-  <header>
-    <span class="logo">Wahn</span>
-    <span class="header-right">Archive</span>
-  </header>
-
-  <main>
-
-    <!-- Artist 1: 수평 드래그 -->
-    <div class="artist-row" id="row-0">
-      <div class="artist-trigger" onclick="toggle(0)">
-        <div class="artist-left">
-          <span class="artist-index">01</span>
-          <span class="artist-name">Artist Name</span>
-        </div>
-        <div class="artist-right">
-          <span class="artist-genre">Graphic</span>
-          <span class="artist-count">— works</span>
-          <span class="artist-plus">+</span>
+<!-- ── 메인 페이지 ── -->
+<div id="page-main">
+  <div class="site-wrap">
+    <header>
+      <span class="logo">Wahn</span>
+      <span class="header-right">Archive</span>
+    </header>
+    <main>
+      <div class="artist-row" onclick="openArtist(0)">
+        <div class="artist-trigger">
+          <div class="artist-left">
+            <span class="artist-index">01</span>
+            <span class="artist-name">Artist Name</span>
+          </div>
+          <div class="artist-right">
+            <span class="artist-genre">Graphic</span>
+            <span class="artist-count">— works</span>
+            <span class="artist-arr">→</span>
+          </div>
         </div>
       </div>
-      <div class="artist-panel display-a">
-        <div class="panel-inner">
+      <div class="artist-row" onclick="openArtist(1)">
+        <div class="artist-trigger">
+          <div class="artist-left">
+            <span class="artist-index">02</span>
+            <span class="artist-name">Artist Name</span>
+          </div>
+          <div class="artist-right">
+            <span class="artist-genre">Photography</span>
+            <span class="artist-count">— works</span>
+            <span class="artist-arr">→</span>
+          </div>
+        </div>
+      </div>
+      <div class="artist-row" onclick="openArtist(2)">
+        <div class="artist-trigger">
+          <div class="artist-left">
+            <span class="artist-index">03</span>
+            <span class="artist-name">Artist Name</span>
+          </div>
+          <div class="artist-right">
+            <span class="artist-genre">Illustration</span>
+            <span class="artist-count">— works</span>
+            <span class="artist-arr">→</span>
+          </div>
+        </div>
+      </div>
+      <div class="artist-row" onclick="openArtist(3)">
+        <div class="artist-trigger">
+          <div class="artist-left">
+            <span class="artist-index">04</span>
+            <span class="artist-name">Artist Name</span>
+          </div>
+          <div class="artist-right">
+            <span class="artist-genre">Mixed Media</span>
+            <span class="artist-count">— works</span>
+            <span class="artist-arr">→</span>
+          </div>
+        </div>
+      </div>
+    </main>
+    <footer>
+      <p>Wahn © 2025</p>
+      <p>All rights reserved</p>
+    </footer>
+  </div>
+</div>
+
+<!-- ── 아티스트 페이지 ── -->
+<div id="page-artist">
+  <div class="artist-page-wrap">
+    <div class="artist-page-header">
+      <div class="back-btn" onclick="closeArtist()">
+        <span class="back-arr">←</span>
+        <span>Back</span>
+      </div>
+      <span class="logo">Wahn</span>
+    </div>
+    <div class="artist-page-title" id="artist-title">Artist Name</div>
+    <div class="artist-page-meta" id="artist-meta">Genre · — works</div>
+    <div class="artist-page-works" id="artist-works"></div>
+  </div>
+</div>
+
+<script>
+  // 커서
+  const cursor = document.getElementById('cursor');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top = e.clientY + 'px';
+  });
+  document.addEventListener('mouseover', e => {
+    if (e.target.closest('a, .artist-row, .back-btn')) cursor.classList.add('hover');
+    else cursor.classList.remove('hover');
+  });
+
+  // 아티스트 데이터
+  const artists = [
+    {
+      name: 'Artist Name',
+      genre: 'Graphic',
+      works: '— works',
+      display: 'a',
+      html: `
+        <div class="display-a">
           <div class="scroll-track" id="track-0">
             <a class="s-card" href="#" style="background:#1a1a2e"><span class="s-card-label">Work 01</span></a>
             <a class="s-card" href="#" style="background:#16213e"><span class="s-card-label">Work 02</span></a>
@@ -221,26 +373,16 @@
             <a class="s-card" href="#" style="background:#1a1a2e"><span class="s-card-label">Work 05</span></a>
             <a class="s-card" href="#" style="background:#0f3460"><span class="s-card-label">Work 06</span></a>
           </div>
-          <p class="hint">← drag to explore</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Artist 2: 3D 틸트 -->
-    <div class="artist-row" id="row-1">
-      <div class="artist-trigger" onclick="toggle(1)">
-        <div class="artist-left">
-          <span class="artist-index">02</span>
-          <span class="artist-name">Artist Name</span>
-        </div>
-        <div class="artist-right">
-          <span class="artist-genre">Photography</span>
-          <span class="artist-count">— works</span>
-          <span class="artist-plus">+</span>
-        </div>
-      </div>
-      <div class="artist-panel display-b">
-        <div class="panel-inner">
+          <p class="hint" style="margin-top:10px;font-size:11px;color:var(--muted);">← drag to explore</p>
+        </div>`
+    },
+    {
+      name: 'Artist Name',
+      genre: 'Photography',
+      works: '— works',
+      display: 'b',
+      html: `
+        <div class="display-b">
           <div class="tilt-grid" id="tilt-grid">
             <a class="t-card" href="#" style="background:#d4a5a5"></a>
             <a class="t-card" href="#" style="background:#b8c6db"></a>
@@ -251,25 +393,15 @@
             <a class="t-card" href="#" style="background:#b5c9d4"></a>
             <a class="t-card" href="#" style="background:#dcd3c9"></a>
           </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Artist 3: 커튼 리빌 -->
-    <div class="artist-row" id="row-2">
-      <div class="artist-trigger" onclick="toggle(2)">
-        <div class="artist-left">
-          <span class="artist-index">03</span>
-          <span class="artist-name">Artist Name</span>
-        </div>
-        <div class="artist-right">
-          <span class="artist-genre">Illustration</span>
-          <span class="artist-count">— works</span>
-          <span class="artist-plus">+</span>
-        </div>
-      </div>
-      <div class="artist-panel display-c">
-        <div class="panel-inner">
+        </div>`
+    },
+    {
+      name: 'Artist Name',
+      genre: 'Illustration',
+      works: '— works',
+      display: 'c',
+      html: `
+        <div class="display-c">
           <div class="reveal-grid">
             <a class="r-item" href="#"><div class="r-bg" style="background:#a8d8ea"></div><div class="r-curtain"></div><span class="r-num">01</span></a>
             <a class="r-item" href="#"><div class="r-bg" style="background:#aa96da"></div><div class="r-curtain"></div><span class="r-num">02</span></a>
@@ -282,25 +414,15 @@
             <a class="r-item" href="#"><div class="r-bg" style="background:#a8d8ea"></div><div class="r-curtain"></div><span class="r-num">09</span></a>
             <a class="r-item" href="#"><div class="r-bg" style="background:#aa96da"></div><div class="r-curtain"></div><span class="r-num">10</span></a>
           </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Artist 4: 타이포 목록 -->
-    <div class="artist-row" id="row-3">
-      <div class="artist-trigger" onclick="toggle(3)">
-        <div class="artist-left">
-          <span class="artist-index">04</span>
-          <span class="artist-name">Artist Name</span>
-        </div>
-        <div class="artist-right">
-          <span class="artist-genre">Mixed Media</span>
-          <span class="artist-count">— works</span>
-          <span class="artist-plus">+</span>
-        </div>
-      </div>
-      <div class="artist-panel display-d">
-        <div class="panel-inner">
+        </div>`
+    },
+    {
+      name: 'Artist Name',
+      genre: 'Mixed Media',
+      works: '— works',
+      display: 'd',
+      html: `
+        <div class="display-d">
           <div class="typo-list">
             <a class="t-item" href="#"><span class="t-title">Work Title</span><div class="t-meta"><span class="t-year">2024</span><span class="t-arr">→</span></div></a>
             <a class="t-item" href="#"><span class="t-title">Work Title</span><div class="t-meta"><span class="t-year">2024</span><span class="t-arr">→</span></div></a>
@@ -308,61 +430,53 @@
             <a class="t-item" href="#"><span class="t-title">Work Title</span><div class="t-meta"><span class="t-year">2023</span><span class="t-arr">→</span></div></a>
             <a class="t-item" href="#"><span class="t-title">Work Title</span><div class="t-meta"><span class="t-year">2022</span><span class="t-arr">→</span></div></a>
           </div>
-        </div>
-      </div>
-    </div>
+        </div>`
+    }
+  ];
 
-  </main>
+  function openArtist(i) {
+    const a = artists[i];
+    document.getElementById('artist-title').textContent = a.name;
+    document.getElementById('artist-meta').textContent = `${a.genre} · ${a.works}`;
+    document.getElementById('artist-works').innerHTML = a.html;
 
-  <footer>
-    <p>Wahn © 2025</p>
-    <p>All rights reserved</p>
-  </footer>
-</div>
+    document.getElementById('page-artist').classList.add('visible');
+    document.getElementById('page-artist').scrollTop = 0;
 
-<script>
-  // 커서
-  const cursor = document.getElementById('cursor');
-  document.addEventListener('mousemove', e => {
-    cursor.style.left = e.clientX + 'px';
-    cursor.style.top = e.clientY + 'px';
-  });
-  document.querySelectorAll('a, .artist-trigger').forEach(el => {
-    el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
-    el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
-  });
-
-  // 아코디언 토글
-  function toggle(i) {
-    const row = document.getElementById('row-' + i);
-    const isOpen = row.classList.contains('open');
-    document.querySelectorAll('.artist-row').forEach(r => r.classList.remove('open'));
-    if (!isOpen) row.classList.add('open');
+    // 틸트 초기화
+    if (a.display === 'b') initTilt();
+    if (a.display === 'a') initDrag();
   }
 
-  // 드래그 스크롤
-  const track = document.getElementById('track-0');
-  let isDragging = false, startX = 0, scrollLeft = 0;
-  track.addEventListener('mousedown', e => { isDragging = true; startX = e.pageX; scrollLeft = track.scrollLeft; });
-  document.addEventListener('mousemove', e => { if (!isDragging) return; track.scrollLeft = scrollLeft - (e.pageX - startX); });
-  document.addEventListener('mouseup', () => isDragging = false);
+  function closeArtist() {
+    document.getElementById('page-artist').classList.remove('visible');
+  }
 
-  // 3D 틸트
-  const tiltGrid = document.getElementById('tilt-grid');
-  if (tiltGrid) {
-    tiltGrid.addEventListener('mousemove', e => {
-      document.querySelectorAll('.t-card').forEach(card => {
-        const rect = card.getBoundingClientRect();
-        const cx = rect.left + rect.width / 2;
-        const cy = rect.top + rect.height / 2;
-        const dx = (e.clientX - cx) / rect.width * 18;
-        const dy = (e.clientY - cy) / rect.height * 18;
-        card.style.transform = `perspective(600px) rotateY(${dx}deg) rotateX(${-dy}deg) scale(1.05)`;
+  function initDrag() {
+    const track = document.getElementById('track-0');
+    if (!track) return;
+    let isDragging = false, startX = 0, scrollLeft = 0;
+    track.addEventListener('mousedown', e => { isDragging = true; startX = e.pageX; scrollLeft = track.scrollLeft; });
+    document.addEventListener('mousemove', e => { if (!isDragging) return; track.scrollLeft = scrollLeft - (e.pageX - startX); });
+    document.addEventListener('mouseup', () => isDragging = false);
+  }
+
+  function initTilt() {
+    setTimeout(() => {
+      const grid = document.getElementById('tilt-grid');
+      if (!grid) return;
+      grid.addEventListener('mousemove', e => {
+        grid.querySelectorAll('.t-card').forEach(card => {
+          const rect = card.getBoundingClientRect();
+          const dx = (e.clientX - rect.left - rect.width / 2) / rect.width * 18;
+          const dy = (e.clientY - rect.top - rect.height / 2) / rect.height * 18;
+          card.style.transform = `perspective(600px) rotateY(${dx}deg) rotateX(${-dy}deg) scale(1.05)`;
+        });
       });
-    });
-    tiltGrid.addEventListener('mouseleave', () => {
-      document.querySelectorAll('.t-card').forEach(c => c.style.transform = '');
-    });
+      grid.addEventListener('mouseleave', () => {
+        grid.querySelectorAll('.t-card').forEach(c => c.style.transform = '');
+      });
+    }, 100);
   }
 </script>
 </body>
