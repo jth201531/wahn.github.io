@@ -77,9 +77,11 @@
 
     /* 타일 */
     .tile {
-      perspective: 800px;
-      position: relative;
-    }
+  perspective: 800px;
+  position: relative;
+  clip-path: var(--clip);
+  margin: -2px;
+}
 
     .tile-inner {
       width: 100%; height: 100%;
@@ -389,27 +391,40 @@
   });
 
   for (let i = 0; i < totalTiles; i++) {
-    const aIdx = tileArtist[i];
-    const a = artists[aIdx];
-    const tile = document.createElement('div');
-    tile.className = 'tile';
+    const clips = [
+  'polygon(0% 5%, 5% 0%, 95% 0%, 100% 5%, 100% 92%, 94% 100%, 6% 100%, 0% 93%)',
+  'polygon(3% 0%, 97% 0%, 100% 4%, 100% 96%, 97% 100%, 3% 100%, 0% 96%, 0% 4%)',
+  'polygon(0% 8%, 8% 0%, 92% 0%, 100% 8%, 100% 90%, 92% 100%, 8% 100%, 0% 90%)',
+  'polygon(5% 0%, 95% 0%, 100% 6%, 100% 94%, 95% 100%, 5% 100%, 0% 94%, 0% 6%)',
+  'polygon(2% 0%, 98% 0%, 100% 3%, 100% 97%, 97% 100%, 3% 100%, 0% 97%, 0% 3%)',
+  'polygon(0% 6%, 6% 0%, 94% 0%, 100% 6%, 100% 94%, 93% 100%, 7% 100%, 0% 93%)',
+  'polygon(4% 0%, 96% 0%, 100% 5%, 100% 95%, 96% 100%, 4% 100%, 0% 95%, 0% 5%)',
+  'polygon(0% 4%, 4% 0%, 96% 0%, 100% 4%, 100% 96%, 96% 100%, 4% 100%, 0% 96%)',
+];
 
-    tile.innerHTML = `
-      <div class="tile-inner">
-        <div class="tile-front">
-          <span class="tile-front-word">${a.adjectives[i % a.adjectives.length]}</span>
-        </div>
-        <div class="tile-back" style="background:${a.color}">
-          <div class="tile-back-index">0${aIdx + 1}</div>
-          <div class="tile-back-name">${a.name}</div>
-          <div class="tile-back-genre">${a.genre}</div>
-        </div>
+for (let i = 0; i < totalTiles; i++) {
+  const aIdx = tileArtist[i];
+  const a = artists[aIdx];
+  const tile = document.createElement('div');
+  tile.className = 'tile';
+  tile.style.setProperty('--clip', clips[i % clips.length]);
+
+  tile.innerHTML = `
+    <div class="tile-inner">
+      <div class="tile-front">
+        <span class="tile-front-word">${a.adjectives[i % a.adjectives.length]}</span>
       </div>
-    `;
+      <div class="tile-back" style="background:${a.color}">
+        <div class="tile-back-index">0${aIdx + 1}</div>
+        <div class="tile-back-name">${a.name}</div>
+        <div class="tile-back-genre">${a.genre}</div>
+      </div>
+    </div>
+  `;
 
-    tile.addEventListener('click', () => openArtist(aIdx));
-    grid.appendChild(tile);
-  }
+  tile.addEventListener('click', () => openArtist(aIdx));
+  grid.appendChild(tile);
+}
 
   // 힌트 숨기기
   let hintHidden = false;
