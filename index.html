@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Wahn</title>
-  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
   <style>
     :root { --bg: #0e0e0e; --fg: #f0ede8; --muted: #555250; --border: rgba(240,237,232,0.1); }
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -13,8 +13,13 @@
     * { cursor: none !important; }
     .cursor { width: 8px; height: 8px; background: var(--fg); border-radius: 50%; position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: width .25s, height .25s, background .25s; }
     .cursor.hover { width: 48px; height: 48px; background: transparent; border: 1px solid var(--fg); }
-    header { position: fixed; top: 0; left: 0; right: 0; padding: 2rem 2.5rem; display: flex; justify-content: space-between; align-items: baseline; z-index: 50; pointer-events: none; }
-    .logo { font-family: 'EB Garamond', serif; font-size: 13px; letter-spacing: 0.22em; text-transform: uppercase; }
+    header { position: fixed; top: 0; left: 0; right: 0; padding: 1rem 2.5rem; display: flex; justify-content: space-between; align-items: baseline; z-index: 50; pointer-events: none; }
+.logo {
+  font-family: 'Bodoni Moda', serif;
+  font-size: 40px;
+  font-weight: 400;
+  letter-spacing: 0.15em;
+}
     .header-right { font-size: 11px; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; }
     #stage { position: fixed; inset: 0; }
     .tile { position: absolute; perspective: 1000px; overflow: hidden; border-radius: 2px; }
@@ -26,7 +31,7 @@
     .tile:hover .tile-front-word { color: rgba(240,237,232,0.7); }
     .tile-back { transform: rotateY(180deg); display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; padding: 20px; overflow: hidden; }
     .tile-back-index { font-size: 10px; letter-spacing: 0.1em; color: rgba(255,255,255,0.4); margin-bottom: 6px; }
-    .tile-back-name { font-family: 'EB Garamond', serif; font-size: clamp(16px,2vw,28px); font-weight: 400; color: #fff; line-height: 1.1; letter-spacing: -0.02em; }
+    .tile-back-name { font-family: 'Bodoni Moda', serif; font-size: clamp(16px,2vw,28px); font-weight: 400; color: #fff; line-height: 1.1; letter-spacing: -0.02em; }
     .tile-back-genre { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-top: 5px; }
     .hint-bar { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); z-index: 50; pointer-events: none; transition: opacity 0.5s; }
     .hint-bar.hidden { opacity: 0; }
@@ -38,7 +43,7 @@
     .back-btn:hover { color: var(--fg); }
     .back-arr { transition: transform 0.3s; display: inline-block; }
     .back-btn:hover .back-arr { transform: translateX(-4px); }
-    .artist-page-title { font-family: 'EB Garamond', serif; font-size: clamp(36px,7vw,80px); font-weight: 400; letter-spacing: -0.03em; line-height: 1; padding: 3rem 0 2rem; opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease 0.1s, transform 0.5s ease 0.1s; }
+    .artist-page-title { font-family: 'Bodoni Moda', serif; font-size: clamp(36px,7vw,80px); font-weight: 400; letter-spacing: -0.03em; line-height: 1; padding: 3rem 0 2rem; opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease 0.1s, transform 0.5s ease 0.1s; }
     #page-artist.visible .artist-page-title { opacity: 1; transform: translateY(0); }
     .artist-page-meta { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); padding-bottom: 2.5rem; border-bottom: 0.5px solid var(--border); opacity: 0; transition: opacity 0.5s ease 0.2s; }
     #page-artist.visible .artist-page-meta { opacity: 1; }
@@ -64,7 +69,7 @@
     .display-d .typo-list { display: flex; flex-direction: column; }
     .display-d .t-item { display: flex; align-items: baseline; justify-content: space-between; padding: 1.2rem 0; border-bottom: 0.5px solid var(--border); text-decoration: none; color: inherit; gap: 1rem; transition: padding-left 0.35s cubic-bezier(0.76,0,0.24,1); }
     .display-d .t-item:hover { padding-left: 1rem; }
-    .display-d .t-title { font-family: 'EB Garamond', serif; font-size: 26px; font-style: italic; transition: opacity 0.2s; }
+    .display-d .t-title { font-family: 'Bodoni Moda', serif; font-size: 26px; font-style: italic; transition: opacity 0.2s; }
     .display-d .t-item:hover .t-title { opacity: 0.4; }
     .display-d .t-meta { display: flex; align-items: center; gap: 1.5rem; }
     .display-d .t-year { font-size: 11px; color: var(--muted); }
@@ -76,15 +81,14 @@
 <div class="cursor" id="cursor"></div>
 <header>
   <span class="logo">Wahn</span>
-  <span class="header-right">Archive</span>
+  <span class="header-right" style="position:fixed; bottom:2rem; right:2.5rem;">Archive</span>
 </header>
 <div id="stage"></div>
-<div class="hint-bar" id="hint">Hover to reveal · Click to enter</div>
 <div id="page-artist">
   <div class="artist-page-wrap">
     <div class="artist-page-header">
       <div class="back-btn" onclick="closeArtist()"><span class="back-arr">←</span><span>Back</span></div>
-      <span class="logo">Wahn</span>
+      <span class="logo">Wahn/span>
     </div>
     <div class="artist-page-title" id="artist-title"></div>
     <div class="artist-page-meta" id="artist-meta"></div>
@@ -159,14 +163,14 @@
   const W = window.innerWidth;
   const H = window.innerHeight;
   const layouts = [
-    { left: 0.03, top: 0.12, w: 0.22, h: 0.42 },
-    { left: 0.27, top: 0.08, w: 0.30, h: 0.55 },
-    { left: 0.60, top: 0.10, w: 0.18, h: 0.30 },
-    { left: 0.80, top: 0.06, w: 0.17, h: 0.50 },
-    { left: 0.04, top: 0.58, w: 0.16, h: 0.34 },
-    { left: 0.22, top: 0.67, w: 0.24, h: 0.28 },
-    { left: 0.49, top: 0.62, w: 0.14, h: 0.22 },
-    { left: 0.65, top: 0.55, w: 0.20, h: 0.38 },
+    { left: 0.03, top: 0.14, w: 0.22, h: 0.42 }, // Artist 1
+    { left: 0.27, top: 0.08, w: 0.30, h: 0.55 }, // Artist 2
+    { left: 0.60, top: 0.10, w: 0.18, h: 0.30 }, // Artist 3
+    { left: 0.80, top: 0.20, w: 0.17, h: 0.50, z:8}, // Artist 4
+    { left: 0.04, top: 0.58, w: 0.16, h: 0.34 }, // 미정 1
+    { left: 0.22, top: 0.67, w: 0.24, h: 0.28 }, // 미정 2
+    { left: 0.49, top: 0.57, w: 0.14, h: 0.4 }, // 미정 3
+    { left: 0.65, top: 0.5, w: 0.20, h: 0.38 }, // 미정 4
   ];
 
   const stage = document.getElementById('stage');
@@ -181,8 +185,10 @@
     tile.style.top    = (l.top  * H) + 'px';
     tile.style.width  = (l.w   * W) + 'px';
     tile.style.height = (l.h   * H) + 'px';
+    tile.style.zIndex = l.z ?? 1;
 
-    const word      = isSoon ? '미정' : a.adjectives[0];
+const soonIdx = i - artists.length + 1;
+    const word      = isSoon ? `미정 ${soonIdx}` : a.adjectives[0];
     const backName  = isSoon ? 'Soon' : a.name;
     const backGenre = isSoon ? '' : a.genre;
     const backIndex = isSoon ? '—' : `0${aIdx + 1}`;
