@@ -35,15 +35,14 @@
       pointer-events: none;
       z-index: 9999;
       transform: translate(-50%, -50%);
-      transition: width 0.2s ease, height 0.2s ease, background 0.2s ease;
+      transition: width 0.25s ease, height 0.25s ease, background 0.25s ease, border 0.25s ease;
     }
     .cursor.hover {
-      width: 36px; height: 36px;
+      width: 48px; height: 48px;
       background: transparent;
       border: 1px solid var(--fg);
     }
 
-    /* 헤더 */
     header {
       position: fixed;
       top: 0; left: 0; right: 0;
@@ -51,7 +50,8 @@
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      z-index: 10;
+      z-index: 50;
+      pointer-events: none;
     }
     .logo {
       font-family: 'EB Garamond', serif;
@@ -59,123 +59,105 @@
       letter-spacing: 0.22em;
       text-transform: uppercase;
     }
-    .header-right { font-size: 11px; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; }
+    .header-right {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
 
-    /* 부채꼴 카드 영역 */
-    #fan-stage {
+    /* 테셀레이션 그리드 */
+    #grid {
       position: fixed;
-      bottom: -30vh;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 1px;
-      height: 1px;
+      inset: 0;
+      display: grid;
     }
 
-    .fan-card {
-      position: absolute;
-      width: 240px;
-      height: 320px;
-      border-radius: 4px;
-      bottom: 0;
-      left: -120px;
-      transform-origin: center bottom;
-      transition: transform 0.6s cubic-bezier(0.76, 0, 0.24, 1);
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 24px;
-      overflow: hidden;
+    /* 타일 */
+    .tile {
+      perspective: 800px;
+      position: relative;
     }
-    .fan-card::before {
-      content: '';
+
+    .tile-inner {
+      width: 100%; height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.65s cubic-bezier(0.76, 0, 0.24, 1);
+    }
+    .tile:hover .tile-inner {
+      transform: rotateY(180deg);
+    }
+
+    .tile-front, .tile-back {
       position: absolute;
       inset: 0;
-      background: rgba(0,0,0,0.3);
-      opacity: 0;
-      transition: opacity 0.3s;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border: 0.5px solid rgba(240,237,232,0.04);
     }
-    .fan-card.active::before { opacity: 0; }
-    .fan-card:not(.active)::before { opacity: 0.5; }
 
-    .fan-card-index {
-      font-size: 11px;
-      letter-spacing: 0.1em;
-      color: rgba(255,255,255,0.5);
-      margin-bottom: 8px;
+    .tile-front {
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .fan-card-name {
+    .tile-front-dot {
+      width: 2px; height: 2px;
+      border-radius: 50%;
+      background: var(--muted);
+      opacity: 0.3;
+    }
+
+    .tile-back {
+      transform: rotateY(180deg);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-end;
+      padding: 16px;
+      overflow: hidden;
+    }
+
+    .tile-back-index {
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.45);
+      margin-bottom: 6px;
+    }
+    .tile-back-name {
       font-family: 'EB Garamond', serif;
-      font-size: 32px;
+      font-size: clamp(14px, 1.8vw, 22px);
       font-weight: 400;
-      line-height: 1.1;
       color: #fff;
+      line-height: 1.1;
       letter-spacing: -0.02em;
     }
-    .fan-card-genre {
-      font-size: 11px;
-      letter-spacing: 0.1em;
+    .tile-back-genre {
+      font-size: 10px;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.5);
-      margin-top: 6px;
+      color: rgba(255,255,255,0.45);
+      margin-top: 4px;
     }
 
-    /* 중앙 active 카드 라벨 */
-    .fan-card-enter {
-      position: absolute;
-      top: 20px; right: 20px;
+    /* 호버 힌트 */
+    .hint-bar {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
       font-size: 10px;
       letter-spacing: 0.15em;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.6);
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-    .fan-card.active .fan-card-enter { opacity: 1; }
-
-    /* 네비게이션 힌트 */
-    .nav-hints {
-      position: fixed;
-      bottom: 2.5rem;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      align-items: center;
-      gap: 2rem;
-      z-index: 10;
-    }
-    .nav-btn {
-      font-size: 11px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
       color: var(--muted);
-      transition: color 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      z-index: 50;
+      pointer-events: none;
+      opacity: 1;
+      transition: opacity 0.5s;
     }
-    .nav-btn:hover { color: var(--fg); }
-    .nav-dot {
-      width: 4px; height: 4px;
-      border-radius: 50%;
-      background: var(--muted);
-      transition: background 0.3s, transform 0.3s;
-    }
-    .nav-dot.active { background: var(--fg); transform: scale(1.5); }
-    .nav-dots { display: flex; gap: 8px; align-items: center; }
-
-    /* 클릭 유도 */
-    .enter-hint {
-      position: fixed;
-      bottom: 5.5rem;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 11px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--muted);
-      z-index: 10;
-      transition: color 0.3s;
-    }
+    .hint-bar.hidden { opacity: 0; }
 
     /* 아티스트 페이지 */
     #page-artist {
@@ -185,7 +167,7 @@
       z-index: 100;
       overflow-y: auto;
       opacity: 0;
-      transform: translateY(40px);
+      transform: translateY(32px);
       pointer-events: none;
       transition: opacity 0.55s cubic-bezier(0.76, 0, 0.24, 1),
                   transform 0.55s cubic-bezier(0.76, 0, 0.24, 1);
@@ -193,6 +175,7 @@
     #page-artist.visible { opacity: 1; transform: translateY(0); pointer-events: all; }
 
     .artist-page-wrap { max-width: 960px; margin: 0 auto; padding: 0 2rem; }
+
     .artist-page-header {
       padding: 2.5rem 0 2rem;
       display: flex; align-items: baseline; justify-content: space-between;
@@ -204,7 +187,7 @@
       display: flex; align-items: center; gap: 6px;
     }
     .back-btn:hover { color: var(--fg); }
-    .back-arr { transition: transform 0.3s ease; display: inline-block; }
+    .back-arr { transition: transform 0.3s; display: inline-block; }
     .back-btn:hover .back-arr { transform: translateX(-4px); }
 
     .artist-page-title {
@@ -232,26 +215,15 @@
     }
     #page-artist.visible .artist-page-works { opacity: 1; transform: translateY(0); }
 
-    /* display types */
-    .display-a .scroll-track {
-      display: flex; gap: 10px; overflow-x: auto;
-      scrollbar-width: none; padding-bottom: 4px;
-    }
+    .display-a .scroll-track { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; }
     .display-a .scroll-track::-webkit-scrollbar { display: none; }
-    .display-a .s-card {
-      flex: 0 0 200px; height: 280px; border-radius: 2px;
-      text-decoration: none; display: flex; align-items: flex-end;
-      padding: 14px; overflow: hidden; transition: flex-basis 0.4s ease;
-    }
+    .display-a .s-card { flex: 0 0 200px; height: 280px; border-radius: 2px; text-decoration: none; display: flex; align-items: flex-end; padding: 14px; transition: flex-basis 0.4s ease; }
     .display-a .s-card:hover { flex-basis: 300px; }
     .display-a .s-card-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.6); }
-    .display-a .hint { font-size: 11px; color: var(--muted); margin-top: 10px; letter-spacing: 0.05em; }
+    .display-a .hint { font-size: 11px; color: var(--muted); margin-top: 10px; }
 
     .display-b .tilt-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-    .display-b .t-card {
-      aspect-ratio: 3/4; border-radius: 2px; display: block; text-decoration: none;
-      transition: transform 0.1s ease, box-shadow 0.2s ease;
-    }
+    .display-b .t-card { aspect-ratio: 3/4; border-radius: 2px; display: block; text-decoration: none; transition: transform 0.1s ease, box-shadow 0.2s ease; }
     .display-b .t-card:hover { box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
 
     .display-c .reveal-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
@@ -264,12 +236,7 @@
     .display-c .r-item:hover .r-num { opacity: 1; }
 
     .display-d .typo-list { display: flex; flex-direction: column; }
-    .display-d .t-item {
-      display: flex; align-items: baseline; justify-content: space-between;
-      padding: 1.2rem 0; border-bottom: 0.5px solid var(--border);
-      text-decoration: none; color: inherit; gap: 1rem;
-      transition: padding-left 0.35s cubic-bezier(0.76, 0, 0.24, 1);
-    }
+    .display-d .t-item { display: flex; align-items: baseline; justify-content: space-between; padding: 1.2rem 0; border-bottom: 0.5px solid var(--border); text-decoration: none; color: inherit; gap: 1rem; transition: padding-left 0.35s cubic-bezier(0.76, 0, 0.24, 1); }
     .display-d .t-item:hover { padding-left: 1rem; }
     .display-d .t-title { font-family: 'EB Garamond', serif; font-size: 26px; font-style: italic; transition: opacity 0.2s; }
     .display-d .t-item:hover .t-title { opacity: 0.4; }
@@ -283,23 +250,13 @@
 
 <div class="cursor" id="cursor"></div>
 
-<!-- 메인 -->
-<div id="page-main">
-  <header>
-    <span class="logo">Wahn</span>
-    <span class="header-right">Archive</span>
-  </header>
+<header>
+  <span class="logo">Wahn</span>
+  <span class="header-right">Archive</span>
+</header>
 
-  <div id="fan-stage"></div>
-
-  <div class="enter-hint" id="enter-hint">Click to enter</div>
-
-  <div class="nav-hints">
-    <div class="nav-btn" onclick="rotate(-1)"><span>←</span> <span>Prev</span></div>
-    <div class="nav-dots" id="nav-dots"></div>
-    <div class="nav-btn" onclick="rotate(1)"><span>Next</span> <span>→</span></div>
-  </div>
-</div>
+<div id="grid"></div>
+<div class="hint-bar" id="hint">Hover to reveal · Click to enter</div>
 
 <!-- 아티스트 페이지 -->
 <div id="page-artist">
@@ -325,14 +282,14 @@
     cursor.style.top = e.clientY + 'px';
   });
   document.addEventListener('mouseover', e => {
-    if (e.target.closest('a, .fan-card, .nav-btn, .back-btn')) cursor.classList.add('hover');
+    if (e.target.closest('.tile, .back-btn')) cursor.classList.add('hover');
     else cursor.classList.remove('hover');
   });
 
   const artists = [
     {
       name: 'Artist Name', genre: 'Graphic', works: '— works',
-      color: '#1a1a2e', display: 'a',
+      color: '#1c1624', display: 'a',
       html: `<div class="display-a">
         <div class="scroll-track" id="track-0">
           <a class="s-card" href="#" style="background:#1a1a2e"><span class="s-card-label">Work 01</span></a>
@@ -347,7 +304,7 @@
     },
     {
       name: 'Artist Name', genre: 'Photography', works: '— works',
-      color: '#2c3e50', display: 'b',
+      color: '#12201a', display: 'b',
       html: `<div class="display-b">
         <div class="tilt-grid" id="tilt-grid">
           <a class="t-card" href="#" style="background:#d4a5a5"></a>
@@ -363,7 +320,7 @@
     },
     {
       name: 'Artist Name', genre: 'Illustration', works: '— works',
-      color: '#1a0a2e', display: 'c',
+      color: '#1a1200', display: 'c',
       html: `<div class="display-c">
         <div class="reveal-grid">
           <a class="r-item" href="#"><div class="r-bg" style="background:#a8d8ea"></div><div class="r-curtain"></div><span class="r-num">01</span></a>
@@ -381,7 +338,7 @@
     },
     {
       name: 'Artist Name', genre: 'Mixed Media', works: '— works',
-      color: '#0a1628', display: 'd',
+      color: '#1a0a0a', display: 'd',
       html: `<div class="display-d">
         <div class="typo-list">
           <a class="t-item" href="#"><span class="t-title">Work Title</span><div class="t-meta"><span class="t-year">2024</span><span class="t-arr">→</span></div></a>
@@ -394,76 +351,63 @@
     }
   ];
 
-  let current = 0;
-  const total = artists.length;
-  const spreadAngle = 20; // 카드 간 각도
+  // 그리드 생성
+  const grid = document.getElementById('grid');
+  const cols = 6;
+  const rows = 5;
+  grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
 
-  const stage = document.getElementById('fan-stage');
-  const dotsEl = document.getElementById('nav-dots');
+  const totalTiles = cols * rows;
+  // 아티스트별 타일 수 분배
+  const tilesPerArtist = Math.floor(totalTiles / artists.length);
 
-  // 카드 생성
-  const cards = artists.map((a, i) => {
-    const card = document.createElement('div');
-    card.className = 'fan-card';
-    card.style.background = a.color;
-    card.innerHTML = `
-      <span class="fan-card-enter">Enter ↗</span>
-      <div class="fan-card-index">0${i + 1}</div>
-      <div class="fan-card-name">${a.name}</div>
-      <div class="fan-card-genre">${a.genre}</div>
+  // 셔플된 인덱스 배열 (타일이 섞여 배치되도록)
+  const indices = Array.from({length: totalTiles}, (_, i) => i);
+  // Fisher-Yates shuffle
+  for (let i = indices.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [indices[i], indices[j]] = [indices[j], indices[i]];
+  }
+
+  // 각 타일에 아티스트 배정
+  const tileArtist = new Array(totalTiles);
+  indices.forEach((tileIdx, order) => {
+    const artistIdx = Math.min(Math.floor(order / tilesPerArtist), artists.length - 1);
+    tileArtist[tileIdx] = artistIdx;
+  });
+
+  for (let i = 0; i < totalTiles; i++) {
+    const aIdx = tileArtist[i];
+    const a = artists[aIdx];
+    const tile = document.createElement('div');
+    tile.className = 'tile';
+
+    tile.innerHTML = `
+      <div class="tile-inner">
+        <div class="tile-front">
+          <div class="tile-front-dot"></div>
+        </div>
+        <div class="tile-back" style="background:${a.color}">
+          <div class="tile-back-index">0${aIdx + 1}</div>
+          <div class="tile-back-name">${a.name}</div>
+          <div class="tile-back-genre">${a.genre}</div>
+        </div>
+      </div>
     `;
-    card.addEventListener('click', () => {
-      if (i === current) openArtist(i);
-      else { current = i; render(); }
-    });
-    stage.appendChild(card);
-    return card;
-  });
 
-  // 도트 생성
-  artists.forEach((_, i) => {
-    const dot = document.createElement('div');
-    dot.className = 'nav-dot';
-    dot.addEventListener('click', () => { current = i; render(); });
-    dotsEl.appendChild(dot);
-  });
-
-  function render() {
-    const dots = dotsEl.querySelectorAll('.nav-dot');
-    cards.forEach((card, i) => {
-      const offset = i - current;
-      const angle = offset * spreadAngle;
-      const scale = i === current ? 1 : 0.85;
-      const zIndex = total - Math.abs(offset);
-      card.style.transform = `rotate(${angle}deg) translateY(${Math.abs(offset) * 10}px) scale(${scale})`;
-      card.style.zIndex = zIndex;
-      card.style.filter = i === current ? 'none' : 'brightness(0.5)';
-      card.classList.toggle('active', i === current);
-    });
-    dots.forEach((d, i) => d.classList.toggle('active', i === current));
+    tile.addEventListener('click', () => openArtist(aIdx));
+    grid.appendChild(tile);
   }
 
-  function rotate(dir) {
-    current = (current + dir + total) % total;
-    render();
-  }
-
-  // 키보드
-  document.addEventListener('keydown', e => {
-    if (e.key === 'ArrowLeft') rotate(-1);
-    if (e.key === 'ArrowRight') rotate(1);
-    if (e.key === 'Enter') openArtist(current);
-  });
-
-  // 스와이프
-  let touchStartX = 0;
-  document.addEventListener('touchstart', e => touchStartX = e.touches[0].clientX);
-  document.addEventListener('touchend', e => {
-    const dx = e.changedTouches[0].clientX - touchStartX;
-    if (Math.abs(dx) > 50) rotate(dx < 0 ? 1 : -1);
-  });
-
-  render();
+  // 힌트 숨기기
+  let hintHidden = false;
+  document.addEventListener('mousemove', () => {
+    if (!hintHidden) {
+      hintHidden = true;
+      document.getElementById('hint').classList.add('hidden');
+    }
+  }, { once: true });
 
   function openArtist(i) {
     const a = artists[i];
