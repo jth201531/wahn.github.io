@@ -23,13 +23,29 @@
     .header-right { font-size: 11px; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; }
     #stage { position: fixed; inset: 0; }
     .tile { position: absolute; perspective: 1000px; overflow: hidden; border-radius: 2px; }
-    .tile-inner { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.7s cubic-bezier(0.76,0,0.24,1); }
-    .tile:hover .tile-inner { transform: rotateY(180deg); }
-    .tile-front, .tile-back { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 2px; }
+    .tile-inner {
+  width: 100%; height: 100%;
+  position: relative;
+}
+    
+   .tile-front, .tile-back {
+  position: absolute;
+  inset: 0;
+  border-radius: 2px;
+}
     .tile-front { background: #141414; border: 1px solid rgba(240,237,232,0.08); display: flex; align-items: center; justify-content: center; }
     .tile-front-word { font-size: clamp(9px,0.8vw,12px); letter-spacing: 0.16em; text-transform: uppercase; color: rgba(240,237,232,0.2); text-align: center; transition: color 0.3s; padding: 0 12px; }
     .tile:hover .tile-front-word { color: rgba(240,237,232,0.7); }
-    .tile-back { transform: rotateY(180deg); display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; padding: 20px; overflow: hidden; }
+  .tile-back {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 20px;
+  overflow: hidden;
+  clip-path: circle(0% at 50% 50%);
+  transition: clip-path 0s;
+}
     .tile-back-index { font-size: 10px; letter-spacing: 0.1em; color: rgba(255,255,255,0.4); margin-bottom: 6px; }
     .tile-back-name { font-family: 'Bodoni Moda', serif; font-size: clamp(16px,2vw,28px); font-weight: 400; color: #fff; line-height: 1.1; letter-spacing: -0.02em; }
     .tile-back-genre { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-top: 5px; }
@@ -60,7 +76,7 @@
     .display-b .t-card:hover { box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
     .display-c .reveal-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 6px; }
     .display-c .r-item { aspect-ratio: 2/3; position: relative; overflow: hidden; border-radius: 2px; display: block; text-decoration: none; }
-    .display-c .r-bg { width: 100%; height: 100%; transition: transform 0.7s cubic-bezier(0.76,0,0.24,1); }
+   
     .display-c .r-item:hover .r-bg { transform: scale(1.08); }
     .display-c .r-curtain { position: absolute; inset: 0; background: var(--bg); transform-origin: top; transition: transform 0.6s cubic-bezier(0.76,0,0.24,1); }
     .display-c .r-item:hover .r-curtain { transform: scaleY(0); }
@@ -205,6 +221,23 @@ const soonIdx = i - artists.length + 1;
           <div class="tile-back-genre">${backGenre}</div>
         </div>
       </div>`;
+
+    tile.addEventListener('mousemove', e => {
+      const back = tile.querySelector('.tile-back');
+      const rect = tile.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
+      const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
+      back.style.clipPath = `circle(120% at ${x}% ${y}%)`;
+      back.style.transition = 'clip-path 0.8s cubic-bezier(0.76, 0, 0.24, 1)';
+    });
+    tile.addEventListener('mouseleave', e => {
+      const back = tile.querySelector('.tile-back');
+      const rect = tile.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
+      const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
+      back.style.clipPath = `circle(0% at ${x}% ${y}%)`;
+      back.style.transition = 'clip-path 0.6s cubic-bezier(0.76, 0, 0.24, 1)';
+    });
 
     if (!isSoon) tile.addEventListener('click', () => openArtist(aIdx));
     stage.appendChild(tile);
