@@ -206,11 +206,11 @@
       const points = 12;
       let radius = 2;
       let frame;
-      const offsets = Array.from({length: points}, () => (Math.random() - 0.5) * 0.4 + 1);
+      const offsets = Array.from({length: points}, () => (Math.random() - 0.5) * 1.2 + 1);
 
       function animate() {
         if (radius < 200) {
-          radius += radius < 20 ? 1 : radius < 80 ? 2.5 : 4;
+          radius += radius < 20 ? 0.4 : radius < 80 ? 0.8 : 1.5;
         } else {
           back.style.clipPath = 'inset(0%)';
           back.style.transition = 'clip-path 0.2s ease';
