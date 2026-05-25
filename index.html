@@ -97,8 +97,8 @@
 
   const artists = [
     {
-      name: 'Artist 1', genre: 'Graphic', works: '— works', color: '#1c1624', display: 'a',
-      adjectives: ['Bold'],
+      name: '이안(理𡚴) iAn', genre: 'Photography', works: '4 works', color: '#A8C5B5', display: 'a',
+      adjectives: ['세상을 평온하게 물들이다'],
       html: `<div class="display-a"><div class="scroll-track" id="track-0">
         <a class="s-card" href="#" style="background:#1a1a2e"><span class="s-card-label">Work 01</span></a>
         <a class="s-card" href="#" style="background:#16213e"><span class="s-card-label">Work 02</span></a>
@@ -210,9 +210,10 @@
 
       function animate() {
         if (radius < 200) {
-          radius += radius < 20 ? 0.4 : radius < 80 ? 0.8 : 1.5;
+          radius += radius < 20 ? 1 : radius < 80 ? 2.5 : 4;
         } else {
           back.style.clipPath = 'inset(0%)';
+          back._filled = true;
           back.style.transition = 'clip-path 0.2s ease';
           cancelAnimationFrame(frame);
           return;
@@ -231,6 +232,7 @@
       }
 
       back._stopAnim = () => cancelAnimationFrame(frame);
+      back._filled = false;
       animate();
     });
 
@@ -244,9 +246,14 @@
       back.style.transition = 'clip-path 0.5s cubic-bezier(0.22, 1, 0.36, 1)';
     });
 
-    if (!isSoon) tile.addEventListener('click', () => openArtist(aIdx));
-    stage.appendChild(tile);
+    if (!isSoon) tile.addEventListener('click', () => {
+      const back = tile.querySelector('.tile-back');
+      if (back._filled) openArtist(aIdx);
+    });
+
+     stage.appendChild(tile);
   });
+
 
   function openArtist(i) {
     const a = artists[i];
