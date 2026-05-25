@@ -222,22 +222,54 @@ const soonIdx = i - artists.length + 1;
         </div>
       </div>`;
 
-    tile.addEventListener('mousemove', e => {
+    tile.addEventListener('mouseenter', e => {
       const back = tile.querySelector('.tile-back');
       const rect = tile.getBoundingClientRect();
       const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
       const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
-      back.style.clipPath = `circle(150% at ${x}% ${y}%)`;
-      back.style.transition = 'clip-path 1.2s cubic-bezier(0.22, 1, 0.36, 1)';
-      back.style.transition = 'clip-path 0.8s cubic-bezier(0.76, 0, 0.24, 1)';
+      back.style.clipPath = `polygon(
+        ${x}% ${y}%,
+        ${+x+12}% ${+y-18}%,
+        ${+x+28}% ${+y-8}%,
+        ${+x+38}% ${+y+10}%,
+        ${+x+22}% ${+y+32}%,
+        ${+x+5}% ${+y+42}%,
+        ${+x-18}% ${+y+35}%,
+        ${+x-30}% ${+y+12}%,
+        ${+x-22}% ${+y-10}%,
+        ${+x-8}% ${+y-22}%
+      )`;
+      back.style.transition = 'clip-path 0s';
+
+      requestAnimationFrame(() => {
+        back.style.clipPath = `polygon(
+          ${+x+60}% ${+y-80}%,
+          ${+x+130}% ${+y-20}%,
+          ${+x+120}% ${+y+60}%,
+          ${+x+80}% ${+y+130}%,
+          ${+x+10}% ${+y+140}%,
+          ${+x-60}% ${+y+110}%,
+          ${+x-110}% ${+y+50}%,
+          ${+x-100}% ${+y-30}%,
+          ${+x-50}% ${+y-90}%,
+          ${+x+20}% ${+y-100}%
+        )`;
+        back.style.transition = 'clip-path 1.2s cubic-bezier(0.22, 1, 0.36, 1)';
+      });
     });
-    tile.addEventListener('mouseleave', e => {
+   tile.addEventListener('mouseleave', e => {
       const back = tile.querySelector('.tile-back');
       const rect = tile.getBoundingClientRect();
       const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
       const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
-      back.style.clipPath = `circle(0% at ${x}% ${y}%)`;
-     back.style.transition = 'clip-path 0.5s cubic-bezier(0.22, 1, 0.36, 1)';
+      back.style.clipPath = `polygon(
+        ${+x+8}% ${+y-10}%,
+        ${+x+12}% ${+y+5}%,
+        ${+x+5}% ${+y+14}%,
+        ${+x-8}% ${+y+10}%,
+        ${+x-10}% ${+y-5}%
+      )`;
+      back.style.transition = 'clip-path 0.5s cubic-bezier(0.22, 1, 0.36, 1)';
     });
 
     if (!isSoon) tile.addEventListener('click', () => openArtist(aIdx));
