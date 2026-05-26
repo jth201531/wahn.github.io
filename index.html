@@ -243,6 +243,7 @@
       const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
       const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
       back.style.clipPath = `circle(0% at ${x}% ${y}%)`;
+      back._filled = false;
       back.style.transition = 'clip-path 0.5s cubic-bezier(0.22, 1, 0.36, 1)';
     });
 
