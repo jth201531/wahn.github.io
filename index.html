@@ -103,7 +103,7 @@ flex-direction: column;}
     },
     {
       name: '박소은 / Soeun Park', genre: 'Oriental Paint', works: '— works', color: '#12201a', display: 'b',
-      adjectives: ['뭐하는사람일까?'],
+      adjectives: ['자기소개'],
       html: `<div class="display-b"><div class="tilt-grid" id="tilt-grid">
         <a class="t-card" href="#" style="background:#d4a5a5"></a>
         <a class="t-card" href="#" style="background:#b8c6db"></a>
@@ -116,24 +116,24 @@ flex-direction: column;}
       </div></div>`
     },
     {
-      name: '유영선', genre: '다매체', works: '3 works', color: '#1a1200', display: 'c',
+      name: '유영선', genre: '다매체', works: '3 works', color: '#147bb7', display: 'c',
       adjectives: ['walkingfly'],
       html: `<div class="display-c" id="fly-stage">
   <div class="work-grid">
-    <a class="w-item" href="#" style="background:#a8d8ea"></a>
-    <a class="w-item" href="#" style="background:#aa96da"></a>
-    <a class="w-item" href="#" style="background:#fcbad3"></a>
-    <a class="w-item" href="#" style="background:#ffffd2"></a>
-    <a class="w-item" href="#" style="background:#a8d8ea"></a>
-    <a class="w-item" href="#" style="background:#aa96da"></a>
-    <a class="w-item" href="#" style="background:#fcbad3"></a>
-    <a class="w-item" href="#" style="background:#b5d5c5"></a>
+    <a class="w-item" href="#" style="background-image:url('images/youngsun/player.jpeg'); background-size:cover; background-position:center;"></a>
+    <a class="w-item" href="#" style="background-image:url('images/youngsun/stone.jpeg'); background-size:cover; background-position:center;"></a>
+    <a class="w-item" href="#" style="background-image:url('images/youngsun/makeup.jpeg'); background-size:cover; background-position:center;"></a>
+    <a class="w-item" href="#" style="background:#1a1200;"></a>
+    <a class="w-item" href="#" style="background:#1a1200;"></a>
+    <a class="w-item" href="#" style="background:#1a1200;"></a>
+    <a class="w-item" href="#" style="background:#1a1200;"></a>
+    <a class="w-item" href="#" style="background:#1a1200;"></a>
   </div>
   <canvas id="fly-canvas"></canvas>
 </div>`
     },
     {
-      name: 'Artist 4', genre: 'Mixed Media', works: '— works', color: '#1a0a0a', display: 'd',
+      name: '김수민', genre: 'Metal Craft', works: '— works', color: '#1a0a0a', display: 'd',
       adjectives: ['Visceral'],
       html: `<div class="display-d"><div class="typo-list">
         <a class="t-item" href="#"><span class="t-title">Work Title</span><div class="t-meta"><span class="t-year">2024</span><span class="t-arr">→</span></div></a>
@@ -287,15 +287,21 @@ function initFlies() {
     const FLEE_RADIUS = 140;
     const FLEE_SPEED = 8;
 
-    const flies = Array.from({length: FLY_COUNT}, () => ({
-      x: Math.random() * rect.width,
-      y: Math.random() * rect.height,
-      vx: (Math.random() - 0.5) * 0.3,
-      vy: (Math.random() - 0.5) * 0.3,
-      angle: Math.random() * Math.PI * 2,
-      wingAngle: Math.random() * Math.PI,
-      size: Math.random() * 6+ 10,
-    }));
+    const flies = Array.from({length: FLY_COUNT}, () => {
+      const x = Math.random() * rect.width;
+      const y = Math.random() * rect.height;
+      return {
+        x, y,
+        homeX: x,
+        homeY: y,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
+        angle: Math.random() * Math.PI * 2,
+        wingAngle: Math.random() * Math.PI,
+        size: Math.random() * 6 + 10,
+        fleeing: false,
+      };
+    });
 
     let mx = -999, my = -999;
 
@@ -343,16 +349,23 @@ function initFlies() {
           const force = (FLEE_RADIUS - dist) / FLEE_RADIUS;
           f.vx += (dx / dist) * force * FLEE_SPEED;
           f.vy += (dy / dist) * force * FLEE_SPEED;
+          f.fleeing = true;
         } else {
+          f.fleeing = false;
+          // 원래 자리로 돌아오기
+          const hx = f.homeX - f.x;
+          const hy = f.homeY - f.y;
+          f.vx += hx * 0.03;
+          f.vy += hy * 0.03;
           f.vx += (Math.random() - 0.5) * 0.4;
-f.vy += (Math.random() - 0.5) * 0.4;
+          f.vy += (Math.random() - 0.5) * 0.4;
         }
 
         // 속도 제한
         const speed = Math.sqrt(f.vx * f.vx + f.vy * f.vy);
-        if (speed > 12) { f.vx = f.vx / speed * 12; f.vy = f.vy / speed * 12; }
-        if (speed > 0.5) { f.vx *= 0.97; f.vy *= 0.97; }
-
+        const maxSpeed = f.fleeing ? 14 : 6;
+        if (speed > maxSpeed) { f.vx = f.vx / speed * maxSpeed; f.vy = f.vy / speed * maxSpeed; }
+        if (speed > 0.5) { f.vx *= 0.96; f.vy *= 0.96; }
         f.x += f.vx;
         f.y += f.vy;
         f.angle = Math.atan2(f.vy, f.vx) + Math.PI / 2;
