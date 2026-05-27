@@ -29,13 +29,13 @@
     .tile-back-genre { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-top: 5px; }
     #page-artist { position: fixed; inset: 0; background: var(--bg); z-index: 100; overflow-y: auto; opacity: 0; transform: translateY(32px); pointer-events: none; transition: opacity 0.55s cubic-bezier(0.76,0,0.24,1), transform 0.55s cubic-bezier(0.76,0,0.24,1); }
     #page-artist.visible { opacity: 1; transform: translateY(0); pointer-events: all; }
-    .artist-page-wrap { max-width: 960px; margin: 0 auto; padding: 0 2rem; }
-    .artist-page-header { padding: 2.5rem 0 2rem; display: flex; align-items: baseline; justify-content: space-between; border-bottom: 0.5px solid var(--border); }
+    .artist-page-wrap { max-width: 100%; padding: 0 4rem; }
+    .artist-page-header { padding: 1.2rem 0 1yyyyyyyrem; display: flex; align-items: baseline; justify-content: space-between; border-bottom: 0.5px solid var(--border); }
     .back-btn { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); transition: color 0.2s; display: flex; align-items: center; gap: 6px; }
     .back-btn:hover { color: var(--fg); }
     .back-arr { transition: transform 0.3s; display: inline-block; }
     .back-btn:hover .back-arr { transform: translateX(-4px); }
-    .artist-page-title { font-family: 'Bodoni Moda', serif; font-size: clamp(36px,7vw,80px); font-weight: 400; letter-spacing: -0.03em; line-height: 1; padding: 3rem 0 2rem; opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease 0.1s, transform 0.5s ease 0.1s; }
+    .artist-page-title { font-family: 'Bodoni Moda', serif; font-size: clamp(36px,7vw,80px); font-weight: 400; letter-spacing: -0.03em; line-height: 1; padding: 1.5rem 0 1rem;; opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease 0.1s, transform 0.5s ease 0.1s; }
     #page-artist.visible .artist-page-title { opacity: 1; transform: translateY(0); }
     .artist-page-meta { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); padding-bottom: 2.5rem; border-bottom: 0.5px solid var(--border); opacity: 0; transition: opacity 0.5s ease 0.2s; }
     #page-artist.visible .artist-page-meta { opacity: 1; }
@@ -109,8 +109,8 @@
       </div><p class="hint">← drag to explore</p></div>`
     },
     {
-      name: 'Artist 2', genre: 'Photography', works: '— works', color: '#12201a', display: 'b',
-      adjectives: ['Quiet'],
+      name: '박소은 / Soeun Park', genre: 'Oriental Paint', works: '— works', color: '#12201a', display: 'b',
+      adjectives: ['뭐하는사람일까?'],
       html: `<div class="display-b"><div class="tilt-grid" id="tilt-grid">
         <a class="t-card" href="#" style="background:#d4a5a5"></a>
         <a class="t-card" href="#" style="background:#b8c6db"></a>
@@ -123,8 +123,8 @@
       </div></div>`
     },
     {
-      name: 'Artist 3', genre: 'Illustration', works: '— works', color: '#1a1200', display: 'c',
-      adjectives: ['Soft'],
+      name: '유영선', genre: '다매체', works: '3 works', color: '#1a1200', display: 'c',
+      adjectives: ['walkingfly'],
       html: `<div class="display-c"><div class="reveal-grid">
         <a class="r-item" href="#"><div class="r-bg" style="background:#a8d8ea"></div><div class="r-curtain"></div><span class="r-num">01</span></a>
         <a class="r-item" href="#"><div class="r-bg" style="background:#aa96da"></div><div class="r-curtain"></div><span class="r-num">02</span></a>
