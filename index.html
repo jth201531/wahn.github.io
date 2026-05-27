@@ -27,7 +27,7 @@
     .tile-back-index { font-size: 10px; letter-spacing: 0.1em; color: rgba(255,255,255,0.4); margin-bottom: 6px; }
     .tile-back-name { font-family: 'Bodoni Moda', serif; font-size: clamp(16px,2vw,28px); font-weight: 400; color: #fff; line-height: 1.1; letter-spacing: -0.02em; }
     .tile-back-genre { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-top: 5px; }
-    #page-artist { position: fixed; inset: 0; background: var(--bg); z-index: 100; overflow-y: hidden; opacity: 0; transform: translateY(32px); pointer-events: none; transition: opacity 0.55s cubic-bezier(0.76,0,0.24,1), transform 0.55s cubic-bezier(0.76,0,0.24,1); display: flex;
+    #page-artist { position: fixed; inset: 0; background: var(--bg); z-index: 100; overflow-y: auto; opacity: 0; transform: translateY(32px); pointer-events: none; transition: opacity 0.55s cubic-bezier(0.76,0,0.24,1), transform 0.55s cubic-bezier(0.76,0,0.24,1); display: flex;
 flex-direction: column;}
     #page-artist.visible { opacity: 1; transform: translateY(0); pointer-events: all; }
   
@@ -54,10 +54,9 @@ flex-direction: column;}
     .display-b .tilt-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
     .display-b .t-card { aspect-ratio: 3/4; border-radius: 2px; display: block; text-decoration: none; transition: transform 0.1s ease, box-shadow 0.2s ease; }
     .display-b .t-card:hover { box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
-    .display-c { position: relative; flex: 1;}
-.display-c .work-grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, 1fr); gap: 12px; height: 100%; }
-.display-c .w-item { border-radius: 2px; display: block; text-decoration: none; height: 100%; }
-.display-c canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
+   .display-c { position: relative; min-height: 80vh; }
+.display-c .w-item { position: absolute; display: block; text-decoration: none; overflow: hidden; border-radius: 2px; }
+.display-c canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 1; }
   </style>
 </head>
 <body>
@@ -67,6 +66,7 @@ flex-direction: column;}
   <span class="header-right" style="position:fixed; bottom:2rem; right:2.5rem;">Archive</span>
 </header>
 <div id="stage"></div>
+<canvas id="fly-canvas" style="display:none; position:fixed; top:0; left:0; pointer-events:none; z-index:200;"></canvas>
 <div id="page-artist">
   <div class="artist-page-wrap">
     <div class="artist-page-header">
@@ -119,17 +119,13 @@ flex-direction: column;}
       name: '유영선', genre: '다매체', works: '3 works', color: '#147bb7', display: 'c',
       adjectives: ['walkingfly'],
       html: `<div class="display-c" id="fly-stage">
-  <div class="work-grid">
-    <a class="w-item" href="#" style="background-image:url('images/youngsun/player.jpeg'); background-size:cover; background-position:center;"></a>
-    <a class="w-item" href="#" style="background-image:url('images/youngsun/stone.jpeg'); background-size:cover; background-position:center;"></a>
-    <a class="w-item" href="#" style="background-image:url('images/youngsun/makeup.jpeg'); background-size:cover; background-position:center;"></a>
-    <a class="w-item" href="#" style="background:#1a1200;"></a>
-    <a class="w-item" href="#" style="background:#1a1200;"></a>
-    <a class="w-item" href="#" style="background:#1a1200;"></a>
-    <a class="w-item" href="#" style="background:#1a1200;"></a>
-    <a class="w-item" href="#" style="background:#1a1200;"></a>
-  </div>
-  <canvas id="fly-canvas"></canvas>
+    
+  <div class="work-grid" style="position:relative; min-height:80vh; z-index:2; pointer-events:all;">
+  <a class="w-item" href="#" style="left:2%; top:2%; width:45%; height:55%; background-image:url('youngsun/player.jpeg'); background-size:cover; background-position:center;"></a>
+  <a class="w-item" href="#" style="left:50%; top:10%; width:30%; height:40%; background-image:url('youngsun/stone.jpeg'); background-size:cover; background-position:center;"></a>
+  <a class="w-item" href="#" style="left:20%; top:60%; width:55%; height:45%; background-image:url('youngsun/makeup.jpeg'); background-size:cover; background-position:center;"></a>
+</div>
+  
 </div>`
     },
     {
@@ -259,10 +255,18 @@ flex-direction: column;}
     document.getElementById('page-artist').scrollTop = 0;
     if (a.display === 'b') initTilt();
     if (a.display === 'a') initDrag();
-    if (a.display === 'c') setTimeout(initFlies, 100);
+    if (a.display === 'c') {
+  document.getElementById('fly-canvas').style.display = 'block';
+  setTimeout(initFlies, 1000);
+}
   }
 
-  function closeArtist() { document.getElementById('page-artist').classList.remove('visible'); }
+ function closeArtist() {
+  document.getElementById('fly-canvas').style.display = 'none';
+  const fc = document.getElementById('fly-canvas');
+  if (fc && fc._stop) fc._stop();
+  document.getElementById('page-artist').classList.remove('visible');
+}
 
   function initDrag() {
     const track = document.getElementById('track-0');
@@ -278,22 +282,44 @@ function initFlies() {
     const canvas = document.getElementById('fly-canvas');
     if (!stage || !canvas) return;
 
-    const rect = stage.getBoundingClientRect();
-    canvas.width = rect.width;
-    canvas.height = rect.height;
+    const rect = document.getElementById('page-artist').getBoundingClientRect();
+canvas.style.position = 'fixed';
+canvas.style.top = '0';
+canvas.style.left = '0';
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
     const ctx = canvas.getContext('2d');
 
     const FLY_COUNT = 600;
     const FLEE_RADIUS = 140;
     const FLEE_SPEED = 8;
 
+    // 작품 영역 수집
+    const items = document.querySelectorAll('.w-item');
+   const pageEl = document.getElementById('page-artist');
+const scrollTop = pageEl.scrollTop;
+const workGrid = document.querySelector('.work-grid');
+const gridRect = workGrid.getBoundingClientRect();
+
+const itemRects = Array.from(items).map(el => {
+  const r = el.getBoundingClientRect();
+  return {
+    left: r.left, top: r.top,
+    right: r.right, bottom: r.bottom,
+    width: r.width, height: r.height,
+  };
+});
+
     const flies = Array.from({length: FLY_COUNT}, () => {
-      const x = Math.random() * rect.width;
-      const y = Math.random() * rect.height;
+      // 랜덤하게 작품 하나 선택
+      const r = itemRects[Math.floor(Math.random() * itemRects.length)];
+      const x = r.left + Math.random() * r.width;
+      const y = r.top + Math.random() * r.height;
       return {
         x, y,
         homeX: x,
         homeY: y,
+        itemRect: r,
         vx: (Math.random() - 0.5) * 0.3,
         vy: (Math.random() - 0.5) * 0.3,
         angle: Math.random() * Math.PI * 2,
@@ -305,12 +331,23 @@ function initFlies() {
 
     let mx = -999, my = -999;
 
-    canvas.parentElement.addEventListener('mousemove', e => {
-      const r = canvas.getBoundingClientRect();
-      mx = e.clientX - r.left;
-      my = e.clientY - r.top;
-    });
-    canvas.parentElement.addEventListener('mouseleave', () => { mx = -999; my = -999; });
+    document.getElementById('page-artist').addEventListener('mousemove', e => {
+  mx = e.clientX;
+  my = e.clientY;
+  const items = document.querySelectorAll('.w-item');
+  Array.from(document.querySelectorAll('.w-item')).forEach((el, i) => {
+    if (!itemRects[i]) return;
+    const r = el.getBoundingClientRect();
+    itemRects[i].left   = r.left;
+    itemRects[i].top    = r.top;
+    itemRects[i].right  = r.right;
+    itemRects[i].bottom = r.bottom;
+    itemRects[i].width  = r.width;
+    itemRects[i].height = r.height;
+  });
+});
+document.getElementById('page-artist').addEventListener('mouseleave', () => { mx = -999; my = -999; });
+
 
     function drawFly(f) {
       ctx.save();
@@ -327,7 +364,7 @@ function initFlies() {
       const w = Math.abs(Math.sin(f.wingAngle)) * f.size * 2.5;
       ctx.beginPath();
       ctx.ellipse(-w * 0.5, -f.size * 0.3, w * 0.5, f.size * 0.6, -0.4, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(10,10,10,0.35)';
+      ctx.fillStyle = 'rgba(30,30,30,0.5)';
       ctx.fill();
       ctx.beginPath();
       ctx.ellipse(w * 0.5, -f.size * 0.3, w * 0.5, f.size * 0.6, 0.4, 0, Math.PI * 2);
@@ -338,7 +375,22 @@ function initFlies() {
 
     let animFrame;
     function loop() {
+      Array.from(document.querySelectorAll('.w-item')).forEach((el, i) => {
+        if (!itemRects[i]) return;
+        const r = el.getBoundingClientRect();
+        itemRects[i].left   = r.left;
+        itemRects[i].top    = r.top;
+        itemRects[i].right  = r.right;
+        itemRects[i].bottom = r.bottom;
+        itemRects[i].width  = r.width;
+        itemRects[i].height = r.height;
+      });
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.save();
+      ctx.beginPath();
+      itemRects.forEach(r => ctx.rect(r.left, r.top, r.width, r.height));
+      ctx.clip();
 
       flies.forEach(f => {
         const dx = f.x - mx;
@@ -352,7 +404,6 @@ function initFlies() {
           f.fleeing = true;
         } else {
           f.fleeing = false;
-          // 원래 자리로 돌아오기
           const hx = f.homeX - f.x;
           const hy = f.homeY - f.y;
           f.vx += hx * 0.03;
@@ -361,7 +412,6 @@ function initFlies() {
           f.vy += (Math.random() - 0.5) * 0.4;
         }
 
-        // 속도 제한
         const speed = Math.sqrt(f.vx * f.vx + f.vy * f.vy);
         const maxSpeed = f.fleeing ? 14 : 6;
         if (speed > maxSpeed) { f.vx = f.vx / speed * maxSpeed; f.vy = f.vy / speed * maxSpeed; }
@@ -371,14 +421,16 @@ function initFlies() {
         f.angle = Math.atan2(f.vy, f.vx) + Math.PI / 2;
         f.wingAngle += 0.3;
 
-        // 벽 반사
-        if (f.x < 0) { f.x = 0; f.vx *= -1; }
-        if (f.x > canvas.width) { f.x = canvas.width; f.vx *= -1; }
-        if (f.y < 0) { f.y = 0; f.vy *= -1; }
-        if (f.y > canvas.height) { f.y = canvas.height; f.vy *= -1; }
+        const r = f.itemRect;
+        if (f.x < r.left) { f.x = r.left; f.vx *= -1; }
+        if (f.x > r.right) { f.x = r.right; f.vx *= -1; }
+        if (f.y < r.top) { f.y = r.top; f.vy *= -1; }
+        if (f.y > r.bottom) { f.y = r.bottom; f.vy *= -1; }
 
         drawFly(f);
       });
+
+      ctx.restore();
 
       animFrame = requestAnimationFrame(loop);
     }
