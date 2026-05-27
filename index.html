@@ -27,19 +27,23 @@
     .tile-back-index { font-size: 10px; letter-spacing: 0.1em; color: rgba(255,255,255,0.4); margin-bottom: 6px; }
     .tile-back-name { font-family: 'Bodoni Moda', serif; font-size: clamp(16px,2vw,28px); font-weight: 400; color: #fff; line-height: 1.1; letter-spacing: -0.02em; }
     .tile-back-genre { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-top: 5px; }
-    #page-artist { position: fixed; inset: 0; background: var(--bg); z-index: 100; overflow-y: auto; opacity: 0; transform: translateY(32px); pointer-events: none; transition: opacity 0.55s cubic-bezier(0.76,0,0.24,1), transform 0.55s cubic-bezier(0.76,0,0.24,1); }
+    #page-artist { position: fixed; inset: 0; background: var(--bg); z-index: 100; overflow-y: hidden; opacity: 0; transform: translateY(32px); pointer-events: none; transition: opacity 0.55s cubic-bezier(0.76,0,0.24,1), transform 0.55s cubic-bezier(0.76,0,0.24,1); display: flex;
+flex-direction: column;}
     #page-artist.visible { opacity: 1; transform: translateY(0); pointer-events: all; }
-    .artist-page-wrap { max-width: 100%; padding: 0 4rem; }
-    .artist-page-header { padding: 1.2rem 0 1yyyyyyyrem; display: flex; align-items: baseline; justify-content: space-between; border-bottom: 0.5px solid var(--border); }
+  
+    .artist-page-header { padding: 1.2rem 0 1rem; display: flex; align-items: baseline; justify-content: space-between; border-bottom: 0.5px solid var(--border); }
     .back-btn { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); transition: color 0.2s; display: flex; align-items: center; gap: 6px; }
     .back-btn:hover { color: var(--fg); }
     .back-arr { transition: transform 0.3s; display: inline-block; }
     .back-btn:hover .back-arr { transform: translateX(-4px); }
-    .artist-page-title { font-family: 'Bodoni Moda', serif; font-size: clamp(36px,7vw,80px); font-weight: 400; letter-spacing: -0.03em; line-height: 1; padding: 1.5rem 0 1rem;; opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease 0.1s, transform 0.5s ease 0.1s; }
+   
     #page-artist.visible .artist-page-title { opacity: 1; transform: translateY(0); }
-    .artist-page-meta { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); padding-bottom: 2.5rem; border-bottom: 0.5px solid var(--border); opacity: 0; transition: opacity 0.5s ease 0.2s; }
+    .artist-page-header-info { display: flex; align-items: baseline; gap: 1.5rem; padding: 0.8rem 0; border-bottom: 0.5px solid var(--border); }
+.artist-page-title { font-family: 'Bodoni Moda', serif; font-size: clamp(24px,4vw,48px); font-weight: 400; letter-spacing: -0.03em; line-height: 1; opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease 0.1s, transform 0.5s ease 0.1s; }
+.artist-page-meta { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); opacity: 0; transition: opacity 0.5s ease 0.2s; }
     #page-artist.visible .artist-page-meta { opacity: 1; }
-    .artist-page-works { padding: 2rem 0; opacity: 0; transform: translateY(16px); transition: opacity 0.5s ease 0.3s, transform 0.5s ease 0.3s; }
+   .artist-page-wrap { max-width: 100%; padding: 0 4rem; display: flex; flex-direction: column; flex: 1; }
+   .artist-page-works { padding: 1rem 0; flex: 1; opacity: 0; transform: translateY(16px); transition: opacity 0.5s ease 0.3s, transform 0.5s ease 0.3s; display: flex; flex-direction: column; }
     #page-artist.visible .artist-page-works { opacity: 1; transform: translateY(0); }
     .display-a .scroll-track { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; }
     .display-a .scroll-track::-webkit-scrollbar { display: none; }
@@ -50,9 +54,9 @@
     .display-b .tilt-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
     .display-b .t-card { aspect-ratio: 3/4; border-radius: 2px; display: block; text-decoration: none; transition: transform 0.1s ease, box-shadow 0.2s ease; }
     .display-b .t-card:hover { box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
-    .display-c { position: relative; }
-.display-c .work-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-.display-c .w-item { aspect-ratio: 3/4; border-radius: 2px; display: block; text-decoration: none; }
+    .display-c { position: relative; flex: 1;}
+.display-c .work-grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, 1fr); gap: 12px; height: 100%; }
+.display-c .w-item { border-radius: 2px; display: block; text-decoration: none; height: 100%; }
 .display-c canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
   </style>
 </head>
@@ -66,11 +70,13 @@
 <div id="page-artist">
   <div class="artist-page-wrap">
     <div class="artist-page-header">
-      <div class="back-btn" onclick="closeArtist()"><span class="back-arr">←</span><span>Back</span></div>
+      <div style="display:flex; align-items:baseline; gap:1rem;">
+        <div class="back-btn" onclick="closeArtist()"><span class="back-arr">←</span><span>Back</span></div>
+        <span id="header-artist-name" style="font-family:'Bodoni Moda',serif; font-size:40px; letter-spacing:0.05em; color:var(--fg);"></span>
+<span id="artist-meta" style="font-size:14px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); position:relative; top:5px;"></span>
+      </div>
       <span class="logo">Wahn</span>
     </div>
-    <div class="artist-page-title" id="artist-title"></div>
-    <div class="artist-page-meta" id="artist-meta"></div>
     <div class="artist-page-works" id="artist-works"></div>
   </div>
 </div>
@@ -246,7 +252,7 @@
 
   function openArtist(i) {
     const a = artists[i];
-    document.getElementById('artist-title').textContent = a.name;
+    document.getElementById('header-artist-name').textContent = a.name;
     document.getElementById('artist-meta').textContent = `${a.genre} · ${a.works}`;
     document.getElementById('artist-works').innerHTML = a.html;
     document.getElementById('page-artist').classList.add('visible');
@@ -277,9 +283,9 @@ function initFlies() {
     canvas.height = rect.height;
     const ctx = canvas.getContext('2d');
 
-    const FLY_COUNT = 180;
-    const FLEE_RADIUS = 80;
-    const FLEE_SPEED = 4;
+    const FLY_COUNT = 600;
+    const FLEE_RADIUS = 140;
+    const FLEE_SPEED = 8;
 
     const flies = Array.from({length: FLY_COUNT}, () => ({
       x: Math.random() * rect.width,
@@ -288,7 +294,7 @@ function initFlies() {
       vy: (Math.random() - 0.5) * 0.3,
       angle: Math.random() * Math.PI * 2,
       wingAngle: Math.random() * Math.PI,
-      size: Math.random() * 2 + 2,
+      size: Math.random() * 6+ 10,
     }));
 
     let mx = -999, my = -999;
@@ -338,14 +344,14 @@ function initFlies() {
           f.vx += (dx / dist) * force * FLEE_SPEED;
           f.vy += (dy / dist) * force * FLEE_SPEED;
         } else {
-          f.vx += (Math.random() - 0.5) * 0.1;
-          f.vy += (Math.random() - 0.5) * 0.1;
+          f.vx += (Math.random() - 0.5) * 0.4;
+f.vy += (Math.random() - 0.5) * 0.4;
         }
 
         // 속도 제한
         const speed = Math.sqrt(f.vx * f.vx + f.vy * f.vy);
-        if (speed > 5) { f.vx = f.vx / speed * 5; }
-        if (speed > 0.3) { f.vx *= 0.95; f.vy *= 0.95; }
+        if (speed > 12) { f.vx = f.vx / speed * 12; f.vy = f.vy / speed * 12; }
+        if (speed > 0.5) { f.vx *= 0.97; f.vy *= 0.97; }
 
         f.x += f.vx;
         f.y += f.vy;
