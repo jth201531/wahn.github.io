@@ -54,6 +54,8 @@ flex-direction: column;}
     .display-b .tilt-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
     .display-b .t-card { aspect-ratio: 3/4; border-radius: 2px; display: block; text-decoration: none; transition: transform 0.1s ease, box-shadow 0.2s ease; }
     .display-b .t-card:hover { box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+    .display-e { position: fixed; inset: 0; z-index: 10; }
+.display-e canvas { position: fixed; top: 0; left: 0; }
    .display-c { position: relative; min-height: 80vh; }
 .display-c .w-item { position: absolute; display: block; text-decoration: none; overflow: hidden; border-radius: 2px; }
 .display-c canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 1; }
@@ -129,15 +131,11 @@ flex-direction: column;}
 </div>`
     },
     {
-      name: '김수민', genre: 'Metal Craft', works: '— works', color: '#1a0a0a', display: 'd',
-      adjectives: ['Visceral'],
-      html: `<div class="display-d"><div class="typo-list">
-        <a class="t-item" href="#"><span class="t-title">Work Title</span><div class="t-meta"><span class="t-year">2024</span><span class="t-arr">→</span></div></a>
-        <a class="t-item" href="#"><span class="t-title">Work Title</span><div class="t-meta"><span class="t-year">2024</span><span class="t-arr">→</span></div></a>
-        <a class="t-item" href="#"><span class="t-title">Work Title</span><div class="t-meta"><span class="t-year">2023</span><span class="t-arr">→</span></div></a>
-        <a class="t-item" href="#"><span class="t-title">Work Title</span><div class="t-meta"><span class="t-year">2023</span><span class="t-arr">→</span></div></a>
-        <a class="t-item" href="#"><span class="t-title">Work Title</span><div class="t-meta"><span class="t-year">2022</span><span class="t-arr">→</span></div></a>
-      </div></div>`
+      name: '김민서', genre: 'Oriental Paint', works: '5 works', color: '#978EF9', display: 'minseo',
+      adjectives: ['자기소개'],
+      html: `<div class="display-e" id="bounce-stage">
+  <canvas id="bounce-canvas"></canvas>
+</div>`,
     }
   ];
 
@@ -259,12 +257,15 @@ flex-direction: column;}
   document.getElementById('fly-canvas').style.display = 'block';
   setTimeout(initFlies, 1000);
 }
+if (a.display === 'minseo') setTimeout(initBounce, 300);
   }
 
  function closeArtist() {
-  document.getElementById('fly-canvas').style.display = 'none';
   const fc = document.getElementById('fly-canvas');
   if (fc && fc._stop) fc._stop();
+  if (fc) fc.style.display = 'none';
+  const bc = document.getElementById('bounce-canvas');
+  if (bc && bc._stop) bc._stop();
   document.getElementById('page-artist').classList.remove('visible');
 }
 
@@ -438,7 +439,48 @@ document.getElementById('page-artist').addEventListener('mouseleave', () => { mx
     loop();
     canvas._stop = () => cancelAnimationFrame(animFrame);
   }
+function initBounce() {
+  const canvas = document.getElementById('bounce-canvas');
+  if (!canvas) return;
+  canvas.style.position = 'fixed';
+  canvas.style.top = '0';
+  canvas.style.left = '0';
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const ctx = canvas.getContext('2d');
 
+  const images = ['minseo/work1.png','minseo/work2.png','minseo/work3.png','minseo/work4.png','minseo/work5.png'];
+  const balls = images.map(src => {
+    const img = new Image();
+    img.src = src;
+    const w = 220, h = 280;
+    return {
+      img, w, h,
+      x: Math.random() * (canvas.width - w),
+      y: Math.random() * (canvas.height - h),
+      vx: (Math.random() - 0.5) * 4 + (Math.random() > 0.5 ? 2 : -2),
+      vy: (Math.random() - 0.5) * 4 + (Math.random() > 0.5 ? 2 : -2),
+    };
+  });
+
+  let animFrame;
+  function loop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    balls.forEach(b => {
+      b.x += b.vx;
+      b.y += b.vy;
+      if (b.x < 0) { b.x = 0; b.vx *= -1; }
+      if (b.x + b.w > canvas.width) { b.x = canvas.width - b.w; b.vx *= -1; }
+      if (b.y < 0) { b.y = 0; b.vy *= -1; }
+      if (b.y + b.h > canvas.height) { b.y = canvas.height - b.h; b.vy *= -1; }
+      if (b.img.complete) ctx.drawImage(b.img, b.x, b.y, b.w, b.h);
+    });
+    animFrame = requestAnimationFrame(loop);
+  }
+
+  loop();
+  canvas._stop = () => cancelAnimationFrame(animFrame);
+}
   function initTilt() {
     setTimeout(() => {
       const g = document.getElementById('tilt-grid');
