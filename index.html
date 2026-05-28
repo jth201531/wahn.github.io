@@ -459,7 +459,7 @@ document.getElementById('page-artist').addEventListener('mouseleave', () => { mx
     { src: 'minseo/work5.png', link: 'https://www.instagram.com/p/DEcxWFhSNAR/' },
   ];
 
-  function extractPolygon(img, w, h, steps = 32) {
+  function extractPolygon(img, w, h, steps = 128) {
     const oc = document.createElement('canvas');
     oc.width = w; oc.height = h;
     const oc_ctx = oc.getContext('2d');
@@ -517,6 +517,12 @@ document.getElementById('page-artist').addEventListener('mouseleave', () => { mx
       const ratio = img.naturalHeight / img.naturalWidth;
       ball.h = w * ratio;
       ball.polygon = extractPolygon(img, w, ball.h);
+      // 픽셀 체크용 offscreen canvas 미리 생성
+      const oc = document.createElement('canvas');
+      oc.width = w; oc.height = ball.h;
+      oc.getContext('2d').drawImage(img, 0, 0, w, ball.h);
+      ball.offscreen = oc;
+      ball.pixelData = oc.getContext('2d').getImageData(0, 0, w, ball.h).data;
       loaded++;
     };
     img.src = item.src;
@@ -526,22 +532,25 @@ document.getElementById('page-artist').addEventListener('mouseleave', () => { mx
   const BOUNDS_W = canvas.width;
   const BOUNDS_H = canvas.height;
 
-  canvas.addEventListener('click', e => {
-    balls.forEach(b => {
-      if (e.clientX > b.x && e.clientX < b.x + b.w &&
-          e.clientY > b.y && e.clientY < b.y + b.h) {
-        window.open(b.link, '_blank');
-      }
-    });
-  });
+  let mouseX = -999, mouseY = -999;
+  canvas.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+  
 
   let animFrame;
   function loop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const hovering = balls.some(b => {
+      if (!b.pixelData) return false;
+      const lx = Math.round(mouseX - b.x);
+      const ly = Math.round(mouseY - b.y);
+      if (lx < 0 || lx >= b.w || ly < 0 || ly >= b.h) return false;
+      return b.pixelData[(ly * b.w + lx) * 4 + 3] > 20;
+    });
+    if (hovering) cursor.classList.add('hover');
+    else cursor.classList.remove('hover');
+
 
     balls.forEach(b => {
-      b.vx *= 0.97;
-      b.vy *= 0.97;
       b.x += b.vx;
       b.y += b.vy;
       if (b.x < 0) { b.x = 0; b.vx = Math.abs(b.vx); }
@@ -578,7 +587,18 @@ document.getElementById('page-artist').addEventListener('mouseleave', () => { mx
 
     animFrame = requestAnimationFrame(loop);
   }
-
+canvas.addEventListener('click', e => {
+    for (const b of balls) {
+      if (!b.pixelData) continue;
+      const lx = Math.round(e.clientX - b.x);
+      const ly = Math.round(e.clientY - b.y);
+      if (lx < 0 || lx >= b.w || ly < 0 || ly >= b.h) continue;
+      if (b.pixelData[(ly * b.w + lx) * 4 + 3] > 20) {
+        window.open(b.link, '_blank');
+        break;
+      }
+    }
+  });
   loop();
   canvas._stop = () => cancelAnimationFrame(animFrame);
 }
