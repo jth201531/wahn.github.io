@@ -1,100 +1,420 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Wahn</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400&display=swap"
+    rel="stylesheet">
   <style>
-    :root { --bg: #0e0e0e; --fg: #f0ede8; --muted: #555250; --border: rgba(240,237,232,0.1); }
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { width: 100%; height: 100%; overflow: hidden; }
-    body { background: var(--bg); color: var(--fg); font-family: 'DM Sans', sans-serif; font-weight: 300; }
-    * { cursor: none !important; }
-    .cursor { width: 8px; height: 8px; background: var(--fg); border-radius: 50%; position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: width .25s, height .25s, background .25s; }
-    .cursor.hover { width: 48px; height: 48px; background: transparent; border: 1px solid var(--fg); }
-    header { position: fixed; top: 0; left: 0; right: 0; padding: 1rem 2.5rem; display: flex; justify-content: flex-start; align-items: baseline; z-index: 50; pointer-events: none; }
-    .logo { font-family: 'Bodoni Moda', serif; font-size: 40px; font-weight: 400; letter-spacing: 0.15em; }
-    .header-right { font-size: 11px; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; }
-    #stage { position: fixed; inset: 0; }
-    .tile { position: absolute; overflow: hidden; border-radius: 2px; }
-    .tile-inner { width: 100%; height: 100%; position: relative; }
-    .tile-front, .tile-back { position: absolute; inset: 0; border-radius: 2px; }
-    .tile-front { background: #141414; border: 1px solid rgba(240,237,232,0.08); display: flex; align-items: center; justify-content: center; }
-    .tile-front-word { font-size: clamp(9px,0.8vw,12px); letter-spacing: 0.16em; text-transform: uppercase; color: rgba(240,237,232,0.2); text-align: center; transition: color 0.3s; padding: 0 12px; }
-    .tile:hover .tile-front-word { color: rgba(240,237,232,0.7); }
-    .tile-back { display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; padding: 20px; overflow: hidden; clip-path: circle(0% at 50% 50%); }
-    .tile-back-index { font-size: 10px; letter-spacing: 0.1em; color: rgba(255,255,255,0.4); margin-bottom: 6px; }
-    .tile-back-name { font-family: 'Bodoni Moda', serif; font-size: clamp(16px,2vw,28px); font-weight: 400; color: #fff; line-height: 1.1; letter-spacing: -0.02em; }
-    .tile-back-genre { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-top: 5px; }
-    #page-artist { position: fixed; inset: 0; background: var(--bg); z-index: 100; overflow-y: auto; opacity: 0; transform: translateY(32px); pointer-events: none; transition: opacity 0.55s cubic-bezier(0.76,0,0.24,1), transform 0.55s cubic-bezier(0.76,0,0.24,1); display: flex;
-flex-direction: column;}
-    #page-artist.visible { opacity: 1; transform: translateY(0); pointer-events: all; }
-  
-    .artist-page-header { padding: 1.2rem 0 1rem; display: flex; align-items: baseline; justify-content: space-between; border-bottom: 0.5px solid var(--border); }
-    .back-btn { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); transition: color 0.2s; display: flex; align-items: center; gap: 6px; }
-    .back-btn:hover { color: var(--fg); }
-    .back-arr { transition: transform 0.3s; display: inline-block; }
-    .back-btn:hover .back-arr { transform: translateX(-4px); }
-   
-    #page-artist.visible .artist-page-title { opacity: 1; transform: translateY(0); }
-    .artist-page-header-info { display: flex; align-items: baseline; gap: 1.5rem; padding: 0.8rem 0; border-bottom: 0.5px solid var(--border); }
-.artist-page-title { font-family: 'Bodoni Moda', serif; font-size: clamp(24px,4vw,48px); font-weight: 400; letter-spacing: -0.03em; line-height: 1; opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease 0.1s, transform 0.5s ease 0.1s; }
-.artist-page-meta { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); opacity: 0; transition: opacity 0.5s ease 0.2s; }
-    #page-artist.visible .artist-page-meta { opacity: 1; }
-   .artist-page-wrap { max-width: 100%; padding: 0 4rem; display: flex; flex-direction: column; flex: 1; }
-   .artist-page-works { padding: 1rem 0; flex: 1; opacity: 0; transform: translateY(16px); transition: opacity 0.5s ease 0.3s, transform 0.5s ease 0.3s; display: flex; flex-direction: column; }
-    #page-artist.visible .artist-page-works { opacity: 1; transform: translateY(0); }
-    .display-a .scroll-track { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; }
-    .display-a .scroll-track::-webkit-scrollbar { display: none; }
-    .display-a .s-card { flex: 0 0 200px; height: 280px; border-radius: 2px; text-decoration: none; display: flex; align-items: flex-end; padding: 14px; transition: flex-basis 0.4s ease; }
-    .display-a .s-card:hover { flex-basis: 300px; }
-    .display-a .s-card-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.6); }
-    .display-a .hint { font-size: 11px; color: var(--muted); margin-top: 10px; }
-    .display-b .tilt-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
-    .display-b .t-card { aspect-ratio: 3/4; border-radius: 2px; display: block; text-decoration: none; transition: transform 0.1s ease, box-shadow 0.2s ease; }
-    .display-b .t-card:hover { box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
-    .display-e { position: fixed; inset: 0; z-index: 10; }
-.display-e canvas { position: fixed; top: 0; left: 0; }
-   .display-c { position: relative; min-height: 80vh; }
-.display-c .w-item { position: absolute; display: block; text-decoration: none; overflow: hidden; border-radius: 2px; }
-.display-c canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 1; }
+    :root {
+      --bg: #0e0e0e;
+      --fg: #f0ede8;
+      --muted: #555250;
+      --border: rgba(240, 237, 232, 0.1);
+    }
+
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+    }
+
+    * {
+      cursor: none !important;
+    }
+
+    .cursor {
+      width: 8px;
+      height: 8px;
+      background: var(--fg);
+      border-radius: 50%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: width .25s, height .25s, background .25s;
+    }
+
+    .cursor.hover {
+      width: 48px;
+      height: 48px;
+      background: transparent;
+      border: 1px solid var(--fg);
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 1rem 2.5rem;
+      display: flex;
+      justify-content: flex-start;
+      align-items: baseline;
+      z-index: 50;
+      pointer-events: none;
+    }
+
+    .logo {
+      font-family: 'Bodoni Moda', serif;
+      font-size: 40px;
+      font-weight: 400;
+      letter-spacing: 0.15em;
+    }
+
+    .header-right {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    #stage {
+      position: fixed;
+      inset: 0;
+    }
+
+    .tile {
+      position: absolute;
+      overflow: hidden;
+      border-radius: 2px;
+    }
+
+    .tile-inner {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    .tile-front,
+    .tile-back {
+      position: absolute;
+      inset: 0;
+      border-radius: 2px;
+    }
+
+    .tile-front {
+      background: #141414;
+      border: 1px solid rgba(240, 237, 232, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tile-front-word {
+      font-size: clamp(9px, 0.8vw, 12px);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(240, 237, 232, 0.2);
+      text-align: center;
+      transition: color 0.3s;
+      padding: 0 12px;
+    }
+
+    .tile:hover .tile-front-word {
+      color: rgba(240, 237, 232, 0.7);
+    }
+
+    .tile-back {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-end;
+      padding: 20px;
+      overflow: hidden;
+      clip-path: circle(0% at 50% 50%);
+    }
+
+    .tile-back-index {
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      color: rgba(255, 255, 255, 0.4);
+      margin-bottom: 6px;
+    }
+
+    .tile-back-name {
+      font-family: 'Bodoni Moda', serif;
+      font-size: clamp(16px, 2vw, 28px);
+      font-weight: 400;
+      color: #fff;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .tile-back-genre {
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.4);
+      margin-top: 5px;
+    }
+
+    #page-artist {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 100;
+      overflow-y: auto;
+      opacity: 0;
+      transform: translateY(32px);
+      pointer-events: none;
+      transition: opacity 0.55s cubic-bezier(0.76, 0, 0.24, 1), transform 0.55s cubic-bezier(0.76, 0, 0.24, 1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    #page-artist.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: all;
+    }
+
+    .artist-page-header {
+      padding: 1.2rem 0 1rem;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      border-bottom: 0.5px solid var(--border);
+    }
+
+    .back-btn {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      transition: color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .back-btn:hover {
+      color: var(--fg);
+    }
+
+    .back-arr {
+      transition: transform 0.3s;
+      display: inline-block;
+    }
+
+    .back-btn:hover .back-arr {
+      transform: translateX(-4px);
+    }
+
+    #page-artist.visible .artist-page-title {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .artist-page-header-info {
+      display: flex;
+      align-items: baseline;
+      gap: 1.5rem;
+      padding: 0.8rem 0;
+      border-bottom: 0.5px solid var(--border);
+    }
+
+    .artist-page-title {
+      font-family: 'Bodoni Moda', serif;
+      font-size: clamp(24px, 4vw, 48px);
+      font-weight: 400;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease 0.1s, transform 0.5s ease 0.1s;
+    }
+
+    .artist-page-meta {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      opacity: 0;
+      transition: opacity 0.5s ease 0.2s;
+    }
+
+    #page-artist.visible .artist-page-meta {
+      opacity: 1;
+    }
+
+    .artist-page-wrap {
+      max-width: 100%;
+      padding: 0 4rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .artist-page-works {
+      padding: 1rem 0;
+      flex: 1;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.5s ease 0.3s, transform 0.5s ease 0.3s;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #page-artist.visible .artist-page-works {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .display-a .scroll-track {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-bottom: 4px;
+    }
+
+    .display-a .scroll-track::-webkit-scrollbar {
+      display: none;
+    }
+
+    .display-a .s-card {
+      flex: 0 0 200px;
+      height: 280px;
+      border-radius: 2px;
+      text-decoration: none;
+      display: flex;
+      align-items: flex-end;
+      padding: 14px;
+      transition: flex-basis 0.4s ease;
+    }
+
+    .display-a .s-card:hover {
+      flex-basis: 300px;
+    }
+
+    .display-a .s-card-label {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .display-a .hint {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+
+    .display-b .tilt-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .display-b .t-card {
+      aspect-ratio: 3/4;
+      border-radius: 2px;
+      display: block;
+      text-decoration: none;
+      transition: transform 0.1s ease, box-shadow 0.2s ease;
+    }
+
+    .display-b .t-card:hover {
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .display-e {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+    }
+
+    .display-e canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: all;
+    }
+
+    .display-c {
+      position: relative;
+      min-height: 80vh;
+    }
+
+    .display-c .w-item {
+      position: absolute;
+      display: block;
+      text-decoration: none;
+      overflow: hidden;
+      border-radius: 2px;
+    }
+
+    .display-c canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 1;
+    }
   </style>
 </head>
-<body>
-<div class="cursor" id="cursor"></div>
-<header>
-  <span class="logo">Wahn</span>
-  <span class="header-right" style="position:fixed; bottom:2rem; right:2.5rem;">Archive</span>
-</header>
-<div id="stage"></div>
-<canvas id="fly-canvas" style="display:none; position:fixed; top:0; left:0; pointer-events:none; z-index:200;"></canvas>
-<div id="page-artist">
-  <div class="artist-page-wrap">
-    <div class="artist-page-header">
-      <div style="display:flex; align-items:baseline; gap:1rem;">
-        <div class="back-btn" onclick="closeArtist()"><span class="back-arr">←</span><span>Back</span></div>
-        <span id="header-artist-name" style="font-family:'Bodoni Moda',serif; font-size:40px; letter-spacing:0.05em; color:var(--fg);"></span>
-<span id="artist-meta" style="font-size:14px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); position:relative; top:5px;"></span>
-      </div>
-      <span class="logo">Wahn</span>
-    </div>
-    <div class="artist-page-works" id="artist-works"></div>
-  </div>
-</div>
-<script>
-  const cursor = document.getElementById('cursor');
-  document.addEventListener('mousemove', e => { cursor.style.left = e.clientX+'px'; cursor.style.top = e.clientY+'px'; });
-  document.addEventListener('mouseover', e => {
-    if (e.target.closest('.tile, .back-btn')) cursor.classList.add('hover');
-    else cursor.classList.remove('hover');
-  });
 
-  const artists = [
-    {
-      name: '이안(理𡚴) iAn', genre: 'Photography', works: '4 works', color: '#A8C5B5', display: 'a',
-      adjectives: ['세상을 평온하게 물들이다'],
-      html: `<div class="display-a"><div class="scroll-track" id="track-0">
+<body>
+  <div class="cursor" id="cursor"></div>
+  <header>
+    <span class="logo">Wahn</span>
+    <span class="header-right" style="position:fixed; bottom:2rem; right:2.5rem;">Archive</span>
+  </header>
+  <div id="stage"></div>
+  <canvas id="fly-canvas"
+    style="display:none; position:fixed; top:0; left:0; pointer-events:none; z-index:200;"></canvas>
+  <div id="page-artist">
+    <div class="artist-page-wrap">
+      <div class="artist-page-header">
+        <div style="display:flex; align-items:baseline; gap:1rem;">
+          <div class="back-btn" onclick="closeArtist()"><span class="back-arr">←</span><span>Back</span></div>
+          <span id="header-artist-name"
+            style="font-family:'Bodoni Moda',serif; font-size:40px; letter-spacing:0.05em; color:var(--fg);"></span>
+          <span id="artist-meta"
+            style="font-size:14px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); position:relative; top:5px;"></span>
+        </div>
+        <span class="logo">Wahn</span>
+      </div>
+      <div class="artist-page-works" id="artist-works"></div>
+    </div>
+  </div>
+  <script>
+    const cursor = document.getElementById('cursor');
+    document.addEventListener('mousemove', e => { cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px'; });
+    document.addEventListener('mouseover', e => {
+      if (e.target.closest('.tile, .back-btn')) cursor.classList.add('hover');
+      else cursor.classList.remove('hover');
+    });
+
+    const artists = [
+      {
+        name: '이안(理𡚴) iAn', genre: 'Photography', works: '4 works', color: '#A8C5B5', display: 'a',
+        adjectives: ['세상을 평온하게 물들이다'],
+        html: `<div class="display-a"><div class="scroll-track" id="track-0">
         <a class="s-card" href="#" style="background:#1a1a2e"><span class="s-card-label">Work 01</span></a>
         <a class="s-card" href="#" style="background:#16213e"><span class="s-card-label">Work 02</span></a>
         <a class="s-card" href="#" style="background:#0f3460"><span class="s-card-label">Work 03</span></a>
@@ -102,11 +422,11 @@ flex-direction: column;}
         <a class="s-card" href="#" style="background:#1a1a2e"><span class="s-card-label">Work 05</span></a>
         <a class="s-card" href="#" style="background:#0f3460"><span class="s-card-label">Work 06</span></a>
       </div><p class="hint">← drag to explore</p></div>`
-    },
-    {
-      name: '박소은 / Soeun Park', genre: 'Oriental Paint', works: '— works', color: '#12201a', display: 'b',
-      adjectives: ['자기소개'],
-      html: `<div class="display-b"><div class="tilt-grid" id="tilt-grid">
+      },
+      {
+        name: '박소은 / Soeun Park', genre: 'Oriental Paint', works: '— works', color: '#12201a', display: 'b',
+        adjectives: ['자기소개'],
+        html: `<div class="display-b"><div class="tilt-grid" id="tilt-grid">
         <a class="t-card" href="#" style="background:#d4a5a5"></a>
         <a class="t-card" href="#" style="background:#b8c6db"></a>
         <a class="t-card" href="#" style="background:#a8c5da"></a>
@@ -116,11 +436,11 @@ flex-direction: column;}
         <a class="t-card" href="#" style="background:#b5c9d4"></a>
         <a class="t-card" href="#" style="background:#dcd3c9"></a>
       </div></div>`
-    },
-    {
-      name: '유영선', genre: '다매체', works: '3 works', color: '#147bb7', display: 'c',
-      adjectives: ['walkingfly'],
-      html: `<div class="display-c" id="fly-stage">
+      },
+      {
+        name: '유영선', genre: '다매체', works: '3 works', color: '#147bb7', display: 'c',
+        adjectives: ['walkingfly'],
+        html: `<div class="display-c" id="fly-stage">
     
   <div class="work-grid" style="position:relative; min-height:80vh; z-index:2; pointer-events:all;">
   <a class="w-item" href="#" style="left:2%; top:2%; width:45%; height:55%; background-image:url('youngsun/player.jpeg'); background-size:cover; background-position:center;"></a>
@@ -129,52 +449,52 @@ flex-direction: column;}
 </div>
   
 </div>`
-    },
-    {
-      name: '김민서', genre: 'Oriental Paint', works: '5 works', color: '#978EF9', display: 'minseo',
-      adjectives: ['자기소개'],
-      html: `<div class="display-e" id="bounce-stage">
+      },
+      {
+        name: '김민서', genre: 'Oriental Paint', works: '5 works', color: '#978EF9', display: 'minseo',
+        adjectives: ['자기소개'],
+        html: `<div class="display-e" id="bounce-stage">
   <canvas id="bounce-canvas"></canvas>
 </div>`,
-    }
-  ];
+      }
+    ];
 
-  const W = window.innerWidth;
-  const H = window.innerHeight;
-  const layouts = [
-    { left: 0.03, top: 0.14, w: 0.22, h: 0.42 }, // Artist 1
-    { left: 0.27, top: 0.08, w: 0.30, h: 0.55 }, // Artist 2
-    { left: 0.60, top: 0.10, w: 0.18, h: 0.30 }, // Artist 3
-    { left: 0.80, top: 0.20, w: 0.17, h: 0.50, z: 8 }, // Artist 4
-    { left: 0.04, top: 0.58, w: 0.16, h: 0.34 }, // 미정 1
-    { left: 0.22, top: 0.67, w: 0.24, h: 0.28 }, // 미정 2
-    { left: 0.49, top: 0.57, w: 0.14, h: 0.40 }, // 미정 3
-    { left: 0.65, top: 0.50, w: 0.20, h: 0.38 }, // 미정 4
-  ];
+    const W = window.innerWidth;
+    const H = window.innerHeight;
+    const layouts = [
+      { left: 0.03, top: 0.14, w: 0.22, h: 0.42 }, // Artist 1
+      { left: 0.27, top: 0.08, w: 0.30, h: 0.55 }, // Artist 2
+      { left: 0.60, top: 0.10, w: 0.18, h: 0.30 }, // Artist 3
+      { left: 0.80, top: 0.20, w: 0.17, h: 0.50, z: 8 }, // Artist 4
+      { left: 0.04, top: 0.58, w: 0.16, h: 0.34 }, // 미정 1
+      { left: 0.22, top: 0.67, w: 0.24, h: 0.28 }, // 미정 2
+      { left: 0.49, top: 0.57, w: 0.14, h: 0.40 }, // 미정 3
+      { left: 0.65, top: 0.50, w: 0.20, h: 0.38 }, // 미정 4
+    ];
 
-  const stage = document.getElementById('stage');
+    const stage = document.getElementById('stage');
 
-  layouts.forEach((l, i) => {
-    const isSoon = i >= artists.length;
-    const aIdx = isSoon ? null : i;
-    const a = isSoon ? null : artists[i];
+    layouts.forEach((l, i) => {
+      const isSoon = i >= artists.length;
+      const aIdx = isSoon ? null : i;
+      const a = isSoon ? null : artists[i];
 
-    const tile = document.createElement('div');
-    tile.className = 'tile';
-    tile.style.left   = (l.left * W) + 'px';
-    tile.style.top    = (l.top  * H) + 'px';
-    tile.style.width  = (l.w   * W) + 'px';
-    tile.style.height = (l.h   * H) + 'px';
-    tile.style.zIndex = l.z ?? 1;
+      const tile = document.createElement('div');
+      tile.className = 'tile';
+      tile.style.left = (l.left * W) + 'px';
+      tile.style.top = (l.top * H) + 'px';
+      tile.style.width = (l.w * W) + 'px';
+      tile.style.height = (l.h * H) + 'px';
+      tile.style.zIndex = l.z ?? 1;
 
-    const soonIdx   = i - artists.length + 1;
-    const word      = isSoon ? `미정 ${soonIdx}` : a.adjectives[0];
-    const backName  = isSoon ? 'Soon' : a.name;
-    const backGenre = isSoon ? '' : a.genre;
-    const backIndex = isSoon ? '—' : `0${aIdx + 1}`;
-    const backBg    = isSoon ? '#161616' : a.color;
+      const soonIdx = i - artists.length + 1;
+      const word = isSoon ? `미정 ${soonIdx}` : a.adjectives[0];
+      const backName = isSoon ? 'Soon' : a.name;
+      const backGenre = isSoon ? '' : a.genre;
+      const backIndex = isSoon ? '—' : `0${aIdx + 1}`;
+      const backBg = isSoon ? '#161616' : a.color;
 
-    tile.innerHTML = `
+      tile.innerHTML = `
       <div class="tile-inner">
         <div class="tile-front">
           <span class="tile-front-word">${word}</span>
@@ -186,437 +506,448 @@ flex-direction: column;}
         </div>
       </div>`;
 
-    tile.addEventListener('mouseenter', e => {
-      const back = tile.querySelector('.tile-back');
-      const rect = tile.getBoundingClientRect();
-      const ox = (e.clientX - rect.left) / rect.width * 100;
-      const oy = (e.clientY - rect.top) / rect.height * 100;
-      const points = 12;
-      let radius = 2;
-      let frame;
-      const offsets = Array.from({length: points}, () => (Math.random() - 0.5) * 1.2 + 1);
+      tile.addEventListener('mouseenter', e => {
+        const back = tile.querySelector('.tile-back');
+        const rect = tile.getBoundingClientRect();
+        const ox = (e.clientX - rect.left) / rect.width * 100;
+        const oy = (e.clientY - rect.top) / rect.height * 100;
+        const points = 12;
+        let radius = 2;
+        let frame;
+        const offsets = Array.from({ length: points }, () => (Math.random() - 0.5) * 1.2 + 1);
 
-      function animate() {
-        if (radius < 200) {
-          radius += radius < 20 ? 1 : radius < 80 ? 2.5 : 4;
-        } else {
-          back.style.clipPath = 'inset(0%)';
-          back._filled = true;
-          back.style.transition = 'clip-path 0.2s ease';
-          cancelAnimationFrame(frame);
-          return;
+        function animate() {
+          if (radius < 200) {
+            radius += radius < 20 ? 1 : radius < 80 ? 2.5 : 4;
+          } else {
+            back.style.clipPath = 'inset(0%)';
+            back._filled = true;
+            back.style.transition = 'clip-path 0.2s ease';
+            cancelAnimationFrame(frame);
+            return;
+          }
+          const pts = Array.from({ length: points }, (_, i) => {
+            const angle = (i / points) * Math.PI * 2;
+            const wobble = offsets[i] + Math.sin(Date.now() * 0.005 + i) * 0.15;
+            const r = radius * wobble;
+            const x = ox + Math.cos(angle) * r;
+            const y = oy + Math.sin(angle) * r * 0.85;
+            return `${x}% ${y}%`;
+          });
+          back.style.transition = 'none';
+          back.style.clipPath = `polygon(${pts.join(',')})`;
+          frame = requestAnimationFrame(animate);
         }
-        const pts = Array.from({length: points}, (_, i) => {
-          const angle = (i / points) * Math.PI * 2;
-          const wobble = offsets[i] + Math.sin(Date.now() * 0.005 + i) * 0.15;
-          const r = radius * wobble;
-          const x = ox + Math.cos(angle) * r;
-          const y = oy + Math.sin(angle) * r * 0.85;
-          return `${x}% ${y}%`;
-        });
-        back.style.transition = 'none';
-        back.style.clipPath = `polygon(${pts.join(',')})`;
-        frame = requestAnimationFrame(animate);
+
+        back._stopAnim = () => cancelAnimationFrame(frame);
+        back._filled = false;
+        animate();
+      });
+
+      tile.addEventListener('mouseleave', e => {
+        const back = tile.querySelector('.tile-back');
+        if (back._stopAnim) back._stopAnim();
+        const rect = tile.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
+        const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
+        back.style.clipPath = `circle(0% at ${x}% ${y}%)`;
+        back._filled = false;
+        back.style.transition = 'clip-path 0.5s cubic-bezier(0.22, 1, 0.36, 1)';
+      });
+
+      if (!isSoon) tile.addEventListener('click', () => {
+        const back = tile.querySelector('.tile-back');
+        if (back._filled) openArtist(aIdx);
+      });
+
+      stage.appendChild(tile);
+    });
+
+
+    function openArtist(i) {
+      const a = artists[i];
+      document.getElementById('header-artist-name').textContent = a.name;
+      document.getElementById('artist-meta').textContent = `${a.genre} · ${a.works}`;
+      document.getElementById('artist-works').innerHTML = a.html;
+      document.getElementById('page-artist').classList.add('visible');
+      document.getElementById('page-artist').scrollTop = 0;
+      if (a.display === 'b') initTilt();
+      if (a.display === 'a') initDrag();
+      if (a.display === 'c') {
+        document.getElementById('fly-canvas').style.display = 'block';
+        setTimeout(initFlies, 1000);
       }
-
-      back._stopAnim = () => cancelAnimationFrame(frame);
-      back._filled = false;
-      animate();
-    });
-
-    tile.addEventListener('mouseleave', e => {
-      const back = tile.querySelector('.tile-back');
-      if (back._stopAnim) back._stopAnim();
-      const rect = tile.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
-      const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
-      back.style.clipPath = `circle(0% at ${x}% ${y}%)`;
-      back._filled = false;
-      back.style.transition = 'clip-path 0.5s cubic-bezier(0.22, 1, 0.36, 1)';
-    });
-
-    if (!isSoon) tile.addEventListener('click', () => {
-      const back = tile.querySelector('.tile-back');
-      if (back._filled) openArtist(aIdx);
-    });
-
-     stage.appendChild(tile);
-  });
-
-
-  function openArtist(i) {
-    const a = artists[i];
-    document.getElementById('header-artist-name').textContent = a.name;
-    document.getElementById('artist-meta').textContent = `${a.genre} · ${a.works}`;
-    document.getElementById('artist-works').innerHTML = a.html;
-    document.getElementById('page-artist').classList.add('visible');
-    document.getElementById('page-artist').scrollTop = 0;
-    if (a.display === 'b') initTilt();
-    if (a.display === 'a') initDrag();
-    if (a.display === 'c') {
-  document.getElementById('fly-canvas').style.display = 'block';
-  setTimeout(initFlies, 1000);
-}
-if (a.display === 'minseo') setTimeout(initBounce, 300);
-  }
-
- function closeArtist() {
-  const fc = document.getElementById('fly-canvas');
-  if (fc && fc._stop) fc._stop();
-  if (fc) fc.style.display = 'none';
-  const bc = document.getElementById('bounce-canvas');
-  if (bc && bc._stop) bc._stop();
-  document.getElementById('page-artist').classList.remove('visible');
-}
-
-  function initDrag() {
-    const track = document.getElementById('track-0');
-    if (!track) return;
-    let isDragging = false, startX = 0, sl = 0;
-    track.addEventListener('mousedown', e => { isDragging = true; startX = e.pageX; sl = track.scrollLeft; });
-    document.addEventListener('mousemove', e => { if (!isDragging) return; track.scrollLeft = sl-(e.pageX-startX); });
-    document.addEventListener('mouseup', () => isDragging = false);
-  }
-
-function initFlies() {
-    const stage = document.getElementById('fly-stage');
-    const canvas = document.getElementById('fly-canvas');
-    if (!stage || !canvas) return;
-
-    const rect = document.getElementById('page-artist').getBoundingClientRect();
-canvas.style.position = 'fixed';
-canvas.style.top = '0';
-canvas.style.left = '0';
-canvas.width = window.innerWidth;
-canvas.height = document.documentElement.clientHeight;
-    const ctx = canvas.getContext('2d');
-
-    const FLY_COUNT = 600;
-    const FLEE_RADIUS = 140;
-    const FLEE_SPEED = 8;
-
-    // 작품 영역 수집
-    const items = document.querySelectorAll('.w-item');
-   const pageEl = document.getElementById('page-artist');
-const scrollTop = pageEl.scrollTop;
-const workGrid = document.querySelector('.work-grid');
-const gridRect = workGrid.getBoundingClientRect();
-
-const itemRects = Array.from(items).map(el => {
-  const r = el.getBoundingClientRect();
-  return {
-    left: r.left, top: r.top,
-    right: r.right, bottom: r.bottom,
-    width: r.width, height: r.height,
-  };
-});
-
-    const flies = Array.from({length: FLY_COUNT}, () => {
-      // 랜덤하게 작품 하나 선택
-      const r = itemRects[Math.floor(Math.random() * itemRects.length)];
-      const x = r.left + Math.random() * r.width;
-      const y = r.top + Math.random() * r.height;
-      return {
-        x, y,
-        homeX: x,
-        homeY: y,
-        itemRect: r,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() - 0.5) * 0.3,
-        angle: Math.random() * Math.PI * 2,
-        wingAngle: Math.random() * Math.PI,
-        size: Math.random() * 6 + 10,
-        fleeing: false,
-      };
-    });
-
-    let mx = -999, my = -999;
-
-    document.getElementById('page-artist').addEventListener('mousemove', e => {
-  mx = e.clientX;
-  my = e.clientY;
-  const items = document.querySelectorAll('.w-item');
-  Array.from(document.querySelectorAll('.w-item')).forEach((el, i) => {
-    if (!itemRects[i]) return;
-    const r = el.getBoundingClientRect();
-    itemRects[i].left   = r.left;
-    itemRects[i].top    = r.top;
-    itemRects[i].right  = r.right;
-    itemRects[i].bottom = r.bottom;
-    itemRects[i].width  = r.width;
-    itemRects[i].height = r.height;
-  });
-});
-document.getElementById('page-artist').addEventListener('mouseleave', () => { mx = -999; my = -999; });
-
-
-    function drawFly(f) {
-      ctx.save();
-      ctx.translate(f.x, f.y);
-      ctx.rotate(f.angle);
-
-      // 몸통
-      ctx.beginPath();
-      ctx.ellipse(0, 0, f.size * 0.5, f.size, 0, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(10,10,10,0.92)';
-      ctx.fill();
-
-      // 날개
-      const w = Math.abs(Math.sin(f.wingAngle)) * f.size * 2.5;
-      ctx.beginPath();
-      ctx.ellipse(-w * 0.5, -f.size * 0.3, w * 0.5, f.size * 0.6, -0.4, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(30,30,30,0.5)';
-      ctx.fill();
-      ctx.beginPath();
-      ctx.ellipse(w * 0.5, -f.size * 0.3, w * 0.5, f.size * 0.6, 0.4, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.restore();
+      if (a.display === 'minseo') setTimeout(initBounce, 300);
     }
 
-    let animFrame;
-    function loop() {
-      Array.from(document.querySelectorAll('.w-item')).forEach((el, i) => {
-        if (!itemRects[i]) return;
+    function closeArtist() {
+      const fc = document.getElementById('fly-canvas');
+      if (fc && fc._stop) fc._stop();
+      if (fc) fc.style.display = 'none';
+      const bc = document.getElementById('bounce-canvas');
+      if (bc && bc._stop) bc._stop();
+      document.getElementById('page-artist').classList.remove('visible');
+    }
+
+    function initDrag() {
+      const track = document.getElementById('track-0');
+      if (!track) return;
+      let isDragging = false, startX = 0, sl = 0;
+      track.addEventListener('mousedown', e => { isDragging = true; startX = e.pageX; sl = track.scrollLeft; });
+      document.addEventListener('mousemove', e => { if (!isDragging) return; track.scrollLeft = sl - (e.pageX - startX); });
+      document.addEventListener('mouseup', () => isDragging = false);
+    }
+
+    function initFlies() {
+      const stage = document.getElementById('fly-stage');
+      const canvas = document.getElementById('fly-canvas');
+      if (!stage || !canvas) return;
+
+      const rect = document.getElementById('page-artist').getBoundingClientRect();
+      canvas.style.position = 'fixed';
+      canvas.style.top = '0';
+      canvas.style.left = '0';
+      canvas.width = window.innerWidth;
+      canvas.height = document.documentElement.clientHeight;
+      const ctx = canvas.getContext('2d');
+
+      const FLY_COUNT = 600;
+      const FLEE_RADIUS = 140;
+      const FLEE_SPEED = 8;
+
+      // 작품 영역 수집
+      const items = document.querySelectorAll('.w-item');
+      const pageEl = document.getElementById('page-artist');
+      const scrollTop = pageEl.scrollTop;
+      const workGrid = document.querySelector('.work-grid');
+      const gridRect = workGrid.getBoundingClientRect();
+
+      const itemRects = Array.from(items).map(el => {
         const r = el.getBoundingClientRect();
-        itemRects[i].left   = r.left;
-        itemRects[i].top    = r.top;
-        itemRects[i].right  = r.right;
-        itemRects[i].bottom = r.bottom;
-        itemRects[i].width  = r.width;
-        itemRects[i].height = r.height;
+        return {
+          left: r.left, top: r.top,
+          right: r.right, bottom: r.bottom,
+          width: r.width, height: r.height,
+        };
       });
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      ctx.save();
-      ctx.beginPath();
-      itemRects.forEach(r => ctx.rect(r.left, r.top, r.width, r.height));
-      ctx.clip();
+      const flies = Array.from({ length: FLY_COUNT }, () => {
+        // 랜덤하게 작품 하나 선택
+        const r = itemRects[Math.floor(Math.random() * itemRects.length)];
+        const x = r.left + Math.random() * r.width;
+        const y = r.top + Math.random() * r.height;
+        return {
+          x, y,
+          homeX: x,
+          homeY: y,
+          itemRect: r,
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: (Math.random() - 0.5) * 0.3,
+          angle: Math.random() * Math.PI * 2,
+          wingAngle: Math.random() * Math.PI,
+          size: Math.random() * 6 + 10,
+          fleeing: false,
+        };
+      });
 
-      flies.forEach(f => {
-        const dx = f.x - mx;
-        const dy = f.y - my;
-        const dist = Math.sqrt(dx * dx + dy * dy);
+      let mx = -999, my = -999;
 
-        if (dist < FLEE_RADIUS) {
-          const force = (FLEE_RADIUS - dist) / FLEE_RADIUS;
-          f.vx += (dx / dist) * force * FLEE_SPEED;
-          f.vy += (dy / dist) * force * FLEE_SPEED;
-          f.fleeing = true;
-        } else {
-          f.fleeing = false;
-          const hx = f.homeX - f.x;
-          const hy = f.homeY - f.y;
-          f.vx += hx * 0.03;
-          f.vy += hy * 0.03;
-          f.vx += (Math.random() - 0.5) * 0.4;
-          f.vy += (Math.random() - 0.5) * 0.4;
+      document.getElementById('page-artist').addEventListener('mousemove', e => {
+        mx = e.clientX;
+        my = e.clientY;
+        const items = document.querySelectorAll('.w-item');
+        Array.from(document.querySelectorAll('.w-item')).forEach((el, i) => {
+          if (!itemRects[i]) return;
+          const r = el.getBoundingClientRect();
+          itemRects[i].left = r.left;
+          itemRects[i].top = r.top;
+          itemRects[i].right = r.right;
+          itemRects[i].bottom = r.bottom;
+          itemRects[i].width = r.width;
+          itemRects[i].height = r.height;
+        });
+      });
+      document.getElementById('page-artist').addEventListener('mouseleave', () => { mx = -999; my = -999; });
+
+
+      function drawFly(f) {
+        ctx.save();
+        ctx.translate(f.x, f.y);
+        ctx.rotate(f.angle);
+
+        // 몸통
+        ctx.beginPath();
+        ctx.ellipse(0, 0, f.size * 0.5, f.size, 0, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(10,10,10,0.92)';
+        ctx.fill();
+
+        // 날개
+        const w = Math.abs(Math.sin(f.wingAngle)) * f.size * 2.5;
+        ctx.beginPath();
+        ctx.ellipse(-w * 0.5, -f.size * 0.3, w * 0.5, f.size * 0.6, -0.4, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(30,30,30,0.5)';
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(w * 0.5, -f.size * 0.3, w * 0.5, f.size * 0.6, 0.4, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+      }
+
+      let animFrame;
+      function loop() {
+        Array.from(document.querySelectorAll('.w-item')).forEach((el, i) => {
+          if (!itemRects[i]) return;
+          const r = el.getBoundingClientRect();
+          itemRects[i].left = r.left;
+          itemRects[i].top = r.top;
+          itemRects[i].right = r.right;
+          itemRects[i].bottom = r.bottom;
+          itemRects[i].width = r.width;
+          itemRects[i].height = r.height;
+        });
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        ctx.save();
+        ctx.beginPath();
+        itemRects.forEach(r => ctx.rect(r.left, r.top, r.width, r.height));
+        ctx.clip();
+
+        flies.forEach(f => {
+          const dx = f.x - mx;
+          const dy = f.y - my;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < FLEE_RADIUS) {
+            const force = (FLEE_RADIUS - dist) / FLEE_RADIUS;
+            f.vx += (dx / dist) * force * FLEE_SPEED;
+            f.vy += (dy / dist) * force * FLEE_SPEED;
+            f.fleeing = true;
+          } else {
+            f.fleeing = false;
+            const hx = f.homeX - f.x;
+            const hy = f.homeY - f.y;
+            f.vx += hx * 0.03;
+            f.vy += hy * 0.03;
+            f.vx += (Math.random() - 0.5) * 0.4;
+            f.vy += (Math.random() - 0.5) * 0.4;
+          }
+
+          const speed = Math.sqrt(f.vx * f.vx + f.vy * f.vy);
+          const maxSpeed = f.fleeing ? 14 : 6;
+          if (speed > maxSpeed) { f.vx = f.vx / speed * maxSpeed; f.vy = f.vy / speed * maxSpeed; }
+          if (speed > 0.5) { f.vx *= 0.96; f.vy *= 0.96; }
+          f.x += f.vx;
+          f.y += f.vy;
+          f.angle = Math.atan2(f.vy, f.vx) + Math.PI / 2;
+          f.wingAngle += 0.3;
+
+          const r = f.itemRect;
+          if (f.x < r.left) { f.x = r.left; f.vx *= -1; }
+          if (f.x > r.right) { f.x = r.right; f.vx *= -1; }
+          if (f.y < r.top) { f.y = r.top; f.vy *= -1; }
+          if (f.y > r.bottom) { f.y = r.bottom; f.vy *= -1; }
+
+          drawFly(f);
+        });
+
+        ctx.restore();
+
+
+        animFrame = requestAnimationFrame(loop);
+      }
+
+      loop();
+      canvas._stop = () => cancelAnimationFrame(animFrame);
+    }
+
+    function initBounce() {
+      const canvas = document.getElementById('bounce-canvas');
+      if (!canvas) return;
+      canvas.style.position = 'fixed';
+      canvas.style.top = '0';
+      canvas.style.left = '0';
+      canvas.width = window.innerWidth;
+      canvas.height = document.documentElement.clientHeight;
+      const ctx = canvas.getContext('2d');
+
+      const images = [
+        { src: 'minseo/work1.png', link: 'https://www.instagram.com/p/DJdxyALp1SL/' },
+        { src: 'minseo/work2.png', link: 'https://www.instagram.com/p/DJdx163Jp7h/' },
+        { src: 'minseo/work3.png', link: 'https://www.instagram.com/p/DJdyfxJJdfC/' },
+        { src: 'minseo/work4.png', link: 'https://www.instagram.com/p/DJdyWAYpxHC/' },
+        { src: 'minseo/work5.png', link: 'https://www.instagram.com/p/DEcxWFhSNAR/' },
+      ];
+
+      function extractPolygon(img, w, h, steps = 128) {
+        const oc = document.createElement('canvas');
+        oc.width = w; oc.height = h;
+        const oc_ctx = oc.getContext('2d');
+        oc_ctx.drawImage(img, 0, 0, w, h);
+        const data = oc_ctx.getImageData(0, 0, w, h).data;
+        const pts = [];
+        for (let a = 0; a < steps; a++) {
+          const angle = (a / steps) * Math.PI * 2;
+          const cx = w / 2, cy = h / 2;
+          const maxR = Math.sqrt(cx * cx + cy * cy);
+          let foundR = 4;
+          for (let r = maxR; r > 4; r -= 2) {
+            const px = Math.round(cx + Math.cos(angle) * r);
+            const py = Math.round(cy + Math.sin(angle) * r);
+            if (px < 0 || px >= w || py < 0 || py >= h) continue;
+            if (data[(py * w + px) * 4 + 3] > 20) { foundR = r; break; }
+          }
+          pts.push({ x: cx + Math.cos(angle) * foundR, y: cy + Math.sin(angle) * foundR });
         }
+        return pts;
+      }
 
-        const speed = Math.sqrt(f.vx * f.vx + f.vy * f.vy);
-        const maxSpeed = f.fleeing ? 14 : 6;
-        if (speed > maxSpeed) { f.vx = f.vx / speed * maxSpeed; f.vy = f.vy / speed * maxSpeed; }
-        if (speed > 0.5) { f.vx *= 0.96; f.vy *= 0.96; }
-        f.x += f.vx;
-        f.y += f.vy;
-        f.angle = Math.atan2(f.vy, f.vx) + Math.PI / 2;
-        f.wingAngle += 0.3;
+      function polygonsOverlap(polyA, oxA, oyA, polyB, oxB, oyB) {
+        for (const p of polyA) {
+          if (pointInPolygon(p.x + oxA, p.y + oyA, polyB, oxB, oyB)) return true;
+        }
+        for (const p of polyB) {
+          if (pointInPolygon(p.x + oxB, p.y + oyB, polyA, oxA, oyA)) return true;
+        }
+        return false;
+      }
 
-        const r = f.itemRect;
-        if (f.x < r.left) { f.x = r.left; f.vx *= -1; }
-        if (f.x > r.right) { f.x = r.right; f.vx *= -1; }
-        if (f.y < r.top) { f.y = r.top; f.vy *= -1; }
-        if (f.y > r.bottom) { f.y = r.bottom; f.vy *= -1; }
+      function pointInPolygon(px, py, poly, ox, oy) {
+        let inside = false;
+        for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+          const xi = poly[i].x + ox, yi = poly[i].y + oy;
+          const xj = poly[j].x + ox, yj = poly[j].y + oy;
+          if (((yi > py) !== (yj > py)) && (px < (xj - xi) * (py - yi) / (yj - yi) + xi)) inside = !inside;
+        }
+        return inside;
+      }
 
-        drawFly(f);
+      let loaded = 0;
+      const balls = images.map(item => {
+        const img = new Image();
+        const w = 220;
+        const ball = {
+          img, w, h: 220, link: item.link, polygon: null,
+          x: Math.random() * (canvas.width - w),
+          y: Math.random() * (canvas.height - 220),
+          vx: (Math.random() - 0.5) * 4 + (Math.random() > 0.5 ? 2 : -2),
+          vy: (Math.random() - 0.5) * 4 + (Math.random() > 0.5 ? 2 : -2),
+        };
+        img.onload = () => {
+          const ratio = img.naturalHeight / img.naturalWidth;
+          ball.h = w * ratio;
+          ball.polygon = extractPolygon(img, w, ball.h);
+          const pw = Math.floor(w);
+          const ph = Math.floor(ball.h);
+          const oc = document.createElement('canvas');
+          oc.width = pw; oc.height = ph;
+          oc.getContext('2d').drawImage(img, 0, 0, pw, ph);
+          ball.pw = pw;
+          ball.ph = ph;
+          ball.offscreen = oc;
+          ball.pixelData = oc.getContext('2d').getImageData(0, 0, pw, ph).data;
+          loaded++;
+        };
+        img.src = item.src;
+        return ball;
       });
 
-      ctx.restore();
-      
+      const BOUNDS_W = canvas.width;
+      const BOUNDS_H = canvas.height;
 
-      animFrame = requestAnimationFrame(loop);
-    }
-
-    loop();
-    canvas._stop = () => cancelAnimationFrame(animFrame);
-  }
-
-  function initBounce() {
-  const canvas = document.getElementById('bounce-canvas');
-  if (!canvas) return;
-  canvas.style.position = 'fixed';
-  canvas.style.top = '0';
-  canvas.style.left = '0';
-  canvas.width = window.innerWidth;
-  canvas.height = document.documentElement.clientHeight;
-  const ctx = canvas.getContext('2d');
-
-  const images = [
-    { src: 'minseo/work1.png', link: 'https://www.instagram.com/p/DJdxyALp1SL/' },
-    { src: 'minseo/work2.png', link: 'https://www.instagram.com/p/DJdx163Jp7h/' },
-    { src: 'minseo/work3.png', link: 'https://www.instagram.com/p/DJdyfxJJdfC/' },
-    { src: 'minseo/work4.png', link: 'https://www.instagram.com/p/DJdyWAYpxHC/' },
-    { src: 'minseo/work5.png', link: 'https://www.instagram.com/p/DEcxWFhSNAR/' },
-  ];
-
-  function extractPolygon(img, w, h, steps = 128) {
-    const oc = document.createElement('canvas');
-    oc.width = w; oc.height = h;
-    const oc_ctx = oc.getContext('2d');
-    oc_ctx.drawImage(img, 0, 0, w, h);
-    const data = oc_ctx.getImageData(0, 0, w, h).data;
-    const pts = [];
-    for (let a = 0; a < steps; a++) {
-      const angle = (a / steps) * Math.PI * 2;
-      const cx = w / 2, cy = h / 2;
-      const maxR = Math.sqrt(cx * cx + cy * cy);
-      let foundR = 4;
-      for (let r = maxR; r > 4; r -= 2) {
-        const px = Math.round(cx + Math.cos(angle) * r);
-        const py = Math.round(cy + Math.sin(angle) * r);
-        if (px < 0 || px >= w || py < 0 || py >= h) continue;
-        if (data[(py * w + px) * 4 + 3] > 20) { foundR = r; break; }
-      }
-      pts.push({ x: cx + Math.cos(angle) * foundR, y: cy + Math.sin(angle) * foundR });
-    }
-    return pts;
-  }
-
-  function polygonsOverlap(polyA, oxA, oyA, polyB, oxB, oyB) {
-    for (const p of polyA) {
-      if (pointInPolygon(p.x + oxA, p.y + oyA, polyB, oxB, oyB)) return true;
-    }
-    for (const p of polyB) {
-      if (pointInPolygon(p.x + oxB, p.y + oyB, polyA, oxA, oyA)) return true;
-    }
-    return false;
-  }
-
-  function pointInPolygon(px, py, poly, ox, oy) {
-    let inside = false;
-    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
-      const xi = poly[i].x + ox, yi = poly[i].y + oy;
-      const xj = poly[j].x + ox, yj = poly[j].y + oy;
-      if (((yi > py) !== (yj > py)) && (px < (xj - xi) * (py - yi) / (yj - yi) + xi)) inside = !inside;
-    }
-    return inside;
-  }
-
-  let loaded = 0;
-  const balls = images.map(item => {
-    const img = new Image();
-    const w = 220;
-    const ball = {
-      img, w, h: 220, link: item.link, polygon: null,
-      x: Math.random() * (canvas.width - w),
-      y: Math.random() * (canvas.height - 220),
-      vx: (Math.random() - 0.5) * 4 + (Math.random() > 0.5 ? 2 : -2),
-      vy: (Math.random() - 0.5) * 4 + (Math.random() > 0.5 ? 2 : -2),
-    };
-    img.onload = () => {
-      const ratio = img.naturalHeight / img.naturalWidth;
-      ball.h = w * ratio;
-      ball.polygon = extractPolygon(img, w, ball.h);
-      // 픽셀 체크용 offscreen canvas 미리 생성
-      const oc = document.createElement('canvas');
-      oc.width = w; oc.height = ball.h;
-      oc.getContext('2d').drawImage(img, 0, 0, w, ball.h);
-      ball.offscreen = oc;
-      ball.pixelData = oc.getContext('2d').getImageData(0, 0, w, ball.h).data;
-      loaded++;
-    };
-    img.src = item.src;
-    return ball;
-  });
-
-  const BOUNDS_W = canvas.width;
-  const BOUNDS_H = canvas.height;
-
-  let mouseX = -999, mouseY = -999;
-  canvas.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
-  
-
-  let animFrame;
-  function loop() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const hovering = balls.some(b => {
-      if (!b.pixelData) return false;
-      const lx = Math.round(mouseX - b.x);
-      const ly = Math.round(mouseY - b.y);
-      if (lx < 0 || lx >= b.w || ly < 0 || ly >= b.h) return false;
-      return b.pixelData[(ly * b.w + lx) * 4 + 3] > 20;
-    });
-    if (hovering) cursor.classList.add('hover');
-    else cursor.classList.remove('hover');
+      let mouseX = -999, mouseY = -999;
+      canvas.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
 
 
-    balls.forEach(b => {
-      b.x += b.vx;
-      b.y += b.vy;
-      if (b.x < 0) { b.x = 0; b.vx = Math.abs(b.vx); }
-      if (b.x + b.w > BOUNDS_W) { b.x = BOUNDS_W - b.w; b.vx = -Math.abs(b.vx); }
-      if (b.y < 0) { b.y = 0; b.vy = Math.abs(b.vy); }
-      if (b.y + b.h > BOUNDS_H) { b.y = BOUNDS_H - b.h; b.vy = -Math.abs(b.vy); }
-      if (b.img.complete && b.img.naturalWidth > 0) {
-        ctx.drawImage(b.img, b.x, b.y, b.w, b.h);
-      }
-    });
+      let animFrame;
+      function loop() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    if (loaded === balls.length) {
-      for (let i = 0; i < balls.length; i++) {
-        for (let j = i + 1; j < balls.length; j++) {
-          const a = balls[i], b = balls[j];
-          if (!a.polygon || !b.polygon) continue;
-          if (polygonsOverlap(a.polygon, a.x, a.y, b.polygon, b.x, b.y)) {
-            const acx = a.x + a.w / 2, acy = a.y + a.h / 2;
-            const bcx = b.x + b.w / 2, bcy = b.y + b.h / 2;
-            const dx = acx - bcx, dy = acy - bcy;
-            const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-            const nx = dx / dist, ny = dy / dist;
-            const relVx = a.vx - b.vx, relVy = a.vy - b.vy;
-            const dot = relVx * nx + relVy * ny;
-            const impulse = dot * 0.8;
-            a.vx -= impulse * nx; a.vy -= impulse * ny;
-            b.vx += impulse * nx; b.vy += impulse * ny;
-            a.x += nx * 2; a.y += ny * 2;
-            b.x -= nx * 2; b.y -= ny * 2;
+        balls.forEach(b => {
+          b.x += b.vx;
+          b.y += b.vy;
+          if (b.x < 0) { b.x = 0; b.vx = Math.abs(b.vx); }
+          if (b.x + b.w > BOUNDS_W) { b.x = BOUNDS_W - b.w; b.vx = -Math.abs(b.vx); }
+          if (b.y < 0) { b.y = 0; b.vy = Math.abs(b.vy); }
+          if (b.y + b.h > BOUNDS_H) { b.y = BOUNDS_H - b.h; b.vy = -Math.abs(b.vy); }
+          if (b.img.complete && b.img.naturalWidth > 0) {
+            ctx.drawImage(b.img, b.x, b.y, b.w, b.h);
+          }
+        });
+
+        if (loaded === balls.length) {
+          for (let i = 0; i < balls.length; i++) {
+            for (let j = i + 1; j < balls.length; j++) {
+              const a = balls[i], b = balls[j];
+              if (!a.polygon || !b.polygon) continue;
+              if (polygonsOverlap(a.polygon, a.x, a.y, b.polygon, b.x, b.y)) {
+                const acx = a.x + a.w / 2, acy = a.y + a.h / 2;
+                const bcx = b.x + b.w / 2, bcy = b.y + b.h / 2;
+                const dx = acx - bcx, dy = acy - bcy;
+                const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+                const nx = dx / dist, ny = dy / dist;
+                const relVx = a.vx - b.vx, relVy = a.vy - b.vy;
+                const dot = relVx * nx + relVy * ny;
+                const impulse = dot * 0.8;
+                a.vx -= impulse * nx; a.vy -= impulse * ny;
+                b.vx += impulse * nx; b.vy += impulse * ny;
+                a.x += nx * 2; a.y += ny * 2;
+                b.x -= nx * 2; b.y -= ny * 2;
+              }
+            }
           }
         }
-      }
-    }
 
-    animFrame = requestAnimationFrame(loop);
-  }
-canvas.addEventListener('click', e => {
-    for (const b of balls) {
-      if (!b.pixelData) continue;
-      const lx = Math.round(e.clientX - b.x);
-      const ly = Math.round(e.clientY - b.y);
-      if (lx < 0 || lx >= b.w || ly < 0 || ly >= b.h) continue;
-      if (b.pixelData[(ly * b.w + lx) * 4 + 3] > 20) {
-        window.open(b.link, '_blank');
-        break;
+        // 그림 그린 후에 픽셀 체크
+        if (mouseX >= 0 && mouseY >= 0) {
+          const rect = canvas.getBoundingClientRect();
+          const scaleX = canvas.width / rect.width;
+          const scaleY = canvas.height / rect.height;
+          const px = Math.round((mouseX - rect.left) * scaleX);
+          const py = Math.round((mouseY - rect.top) * scaleY);
+          const pixel = ctx.getImageData(px, py, 1, 1).data;
+          if (pixel[3] > 20) cursor.classList.add('hover');
+          else cursor.classList.remove('hover');
+        }
+
+        animFrame = requestAnimationFrame(loop);
       }
-    }
-  });
-  loop();
-  canvas._stop = () => cancelAnimationFrame(animFrame);
-}
-  function initTilt() {
-    setTimeout(() => {
-      const g = document.getElementById('tilt-grid');
-      if (!g) return;
-      g.addEventListener('mousemove', e => {
-        g.querySelectorAll('.t-card').forEach(card => {
-          const r = card.getBoundingClientRect();
-          const dx = (e.clientX-r.left-r.width/2)/r.width*18;
-          const dy = (e.clientY-r.top-r.height/2)/r.height*18;
-          card.style.transform = `perspective(600px) rotateY(${dx}deg) rotateX(${-dy}deg) scale(1.05)`;
-        });
+      canvas.addEventListener('click', e => {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const px = Math.round((e.clientX - rect.left) * scaleX);
+        const py = Math.round((e.clientY - rect.top) * scaleY);
+        const pixel = ctx.getImageData(px, py, 1, 1).data;
+        if (pixel[3] > 20) {
+          for (const b of balls) {
+            if (e.clientX > b.x && e.clientX < b.x + b.w &&
+              e.clientY > b.y && e.clientY < b.y + b.h) {
+              window.open(b.link, '_blank');
+              break;
+            }
+          }
+        }
       });
-      g.addEventListener('mouseleave', () => g.querySelectorAll('.t-card').forEach(c => c.style.transform = ''));
-    }, 100);
-  }
-</script>
+      loop();
+      canvas._stop = () => cancelAnimationFrame(animFrame);
+    }
+    function initTilt() {
+      setTimeout(() => {
+        const g = document.getElementById('tilt-grid');
+        if (!g) return;
+        g.addEventListener('mousemove', e => {
+          g.querySelectorAll('.t-card').forEach(card => {
+            const r = card.getBoundingClientRect();
+            const dx = (e.clientX - r.left - r.width / 2) / r.width * 18;
+            const dy = (e.clientY - r.top - r.height / 2) / r.height * 18;
+            card.style.transform = `perspective(600px) rotateY(${dx}deg) rotateX(${-dy}deg) scale(1.05)`;
+          });
+        });
+        g.addEventListener('mouseleave', () => g.querySelectorAll('.t-card').forEach(c => c.style.transform = ''));
+      }, 100);
+    }
+  </script>
 </body>
+
 </html>
