@@ -288,7 +288,7 @@ canvas.style.position = 'fixed';
 canvas.style.top = '0';
 canvas.style.left = '0';
 canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+canvas.height = document.documentElement.clientHeight;
     const ctx = canvas.getContext('2d');
 
     const FLY_COUNT = 600;
@@ -432,6 +432,7 @@ document.getElementById('page-artist').addEventListener('mouseleave', () => { mx
       });
 
       ctx.restore();
+      
 
       animFrame = requestAnimationFrame(loop);
     }
@@ -449,32 +450,136 @@ function initBounce() {
   canvas.height = window.innerHeight;
   const ctx = canvas.getContext('2d');
 
-  const images = ['minseo/work1.png','minseo/work2.png','minseo/work3.png','minseo/work4.png','minseo/work5.png'];
-  const balls = images.map(src => {
+  const imageSrcs = ['minseo/work1.png','minseo/work2.png','minseo/work3.png','minseo/work4.png','minseo/work5.png'];
+
+  // 알파채널로 폴리곤 추출
+  function extractPolygon(img, w, h, steps = 32) {
+    const oc = document.createElement('canvas');
+    oc.width = w; oc.height = h;
+    const oc_ctx = oc.getContext('2d');
+    oc_ctx.drawImage(img, 0, 0, w, h);
+    const data = oc_ctx.getImageData(0, 0, w, h).data;
+
+    const pts = [];
+    for (let a = 0; a < steps; a++) {
+      const angle = (a / steps) * Math.PI * 2;
+      const cx = w / 2, cy = h / 2;
+      const maxR = Math.sqrt(cx * cx + cy * cy);
+      let foundR = 4;
+      for (let r = maxR; r > 4; r -= 2) {
+        const px = Math.round(cx + Math.cos(angle) * r);
+        const py = Math.round(cy + Math.sin(angle) * r);
+        if (px < 0 || px >= w || py < 0 || py >= h) continue;
+        const alpha = data[(py * w + px) * 4 + 3];
+        if (alpha > 20) { foundR = r; break; }
+      }
+      pts.push({
+        x: cx + Math.cos(angle) * foundR,
+        y: cy + Math.sin(angle) * foundR,
+      });
+    }
+    return pts;
+  }
+
+  // 폴리곤 충돌 (SAT 간소화 - AABB + 폴리곤 포인트 체크)
+  function polygonsOverlap(polyA, oxA, oyA, polyB, oxB, oyB) {
+    for (const p of polyA) {
+      const wx = p.x + oxA, wy = p.y + oyA;
+      if (pointInPolygon(wx, wy, polyB, oxB, oyB)) return true;
+    }
+    for (const p of polyB) {
+      const wx = p.x + oxB, wy = p.y + oyB;
+      if (pointInPolygon(wx, wy, polyA, oxA, oyA)) return true;
+    }
+    return false;
+  }
+
+  function pointInPolygon(px, py, poly, ox, oy) {
+    let inside = false;
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      const xi = poly[i].x + ox, yi = poly[i].y + oy;
+      const xj = poly[j].x + ox, yj = poly[j].y + oy;
+      if (((yi > py) !== (yj > py)) && (px < (xj - xi) * (py - yi) / (yj - yi) + xi)) {
+        inside = !inside;
+      }
+    }
+    return inside;
+  }
+
+  // 이미지 로드 후 볼 생성
+  let loaded = 0;
+  const balls = imageSrcs.map((src, idx) => {
     const img = new Image();
-    img.src = src;
-    const w = 220, h = 280;
-    return {
-      img, w, h,
+    const w = 220;
+    const ball = {
+      img, w, h: 220,
+      polygon: null,
       x: Math.random() * (canvas.width - w),
-      y: Math.random() * (canvas.height - h),
+      y: Math.random() * (canvas.height - 220),
       vx: (Math.random() - 0.5) * 4 + (Math.random() > 0.5 ? 2 : -2),
       vy: (Math.random() - 0.5) * 4 + (Math.random() > 0.5 ? 2 : -2),
     };
+    img.onload = () => {
+      const ratio = img.naturalHeight / img.naturalWidth;
+      ball.h = w * ratio;
+      ball.polygon = extractPolygon(img, w, ball.h);
+      loaded++;
+    };
+    img.src = src;
+    return ball;
   });
 
   let animFrame;
   function loop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+const visibleH = canvas.height;
+
     balls.forEach(b => {
       b.x += b.vx;
       b.y += b.vy;
       if (b.x < 0) { b.x = 0; b.vx *= -1; }
       if (b.x + b.w > canvas.width) { b.x = canvas.width - b.w; b.vx *= -1; }
       if (b.y < 0) { b.y = 0; b.vy *= -1; }
-      if (b.y + b.h > canvas.height) { b.y = canvas.height - b.h; b.vy *= -1; }
-      if (b.img.complete) ctx.drawImage(b.img, b.x, b.y, b.w, b.h);
+      if (b.y + b.h > visibleH) { b.y = visibleH - b.h; b.vy *= -1; }
+      if (b.img.complete && b.img.naturalWidth > 0) {
+        ctx.drawImage(b.img, b.x, b.y, b.w, b.h);
+      }
     });
+
+    // 폴리곤 충돌
+    if (loaded === balls.length) {
+      for (let i = 0; i < balls.length; i++) {
+        for (let j = i + 1; j < balls.length; j++) {
+          const a = balls[i], b = balls[j];
+          if (!a.polygon || !b.polygon) continue;
+          if (polygonsOverlap(a.polygon, a.x, a.y, b.polygon, b.x, b.y)) {
+            // 중심간 방향 계산
+            const acx = a.x + a.w / 2, acy = a.y + a.h / 2;
+            const bcx = b.x + b.w / 2, bcy = b.y + b.h / 2;
+            const dx = acx - bcx, dy = acy - bcy;
+            const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+            const nx = dx / dist, ny = dy / dist;
+
+            // 속도 반사
+            const relVx = a.vx - b.vx, relVy = a.vy - b.vy;
+            const dot = relVx * nx + relVy * ny;
+            const impulse = dot * 0.8;
+            a.vx -= impulse * nx;
+            a.vy -= impulse * ny;
+            b.vx += impulse * nx;
+            b.vy += impulse * ny;
+
+            // 겹침 해소
+            const overlap = 2;
+            a.x += nx * overlap;
+            a.y += ny * overlap;
+            b.x -= nx * overlap;
+            b.y -= ny * overlap;
+          }
+        }
+      }
+    }
+
     animFrame = requestAnimationFrame(loop);
   }
 
