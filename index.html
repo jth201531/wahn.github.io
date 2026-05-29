@@ -332,12 +332,9 @@
       border-radius: 2px;
       display: block;
       text-decoration: none;
-      transition: transform 0.1s ease, box-shadow 0.2s ease;
+  
     }
 
-    .display-b .t-card:hover {
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-    }
 
     .display-e {
       position: fixed;
@@ -434,18 +431,11 @@
         name: '박소은 / Soeun Park', genre: 'Oriental Paint', works: '— works', color: '#12201a', display: 'b',
         adjectives: ['자기소개'],
         html: `<div class="display-b"><div class="tilt-grid" id="tilt-grid">
-        <a class="t-card" href="#" style="background:#d4a5a5"></a>
-        <a class="t-card" href="#" style="background:#b8c6db"></a>
-        <a class="t-card" href="#" style="background:#a8c5da"></a>
-        <a class="t-card" href="#" style="background:#c9b8a8"></a>
-        <a class="t-card" href="#" style="background:#d8e4bc"></a>
-        <a class="t-card" href="#" style="background:#e8d5c4"></a>
-        <a class="t-card" href="#" style="background:#b5c9d4"></a>
-        <a class="t-card" href="#" style="background:#dcd3c9"></a>
-      </div></div>`
+        <a class="t-card" href="#" style="background-image:url('soeun/work1.png'); background-size:contain; background-repeat:no-repeat; background-position:top left; background-color:#f8f7f4;"></a>
+      </div></div>`,
       },
       {
-        name: '유영선', genre: '다매체', works: '3 works', color: '#147bb7', display: 'c',
+        name: '유영선', genre: 'Multimedia', works: '3 works', color: '#147bb7', display: 'c',
         adjectives: ['자기소개'],
         html: `<div class="display-c" id="fly-stage">
     
@@ -972,21 +962,7 @@ canvas.addEventListener('click', e => {
       loop();
       canvas._stop = () => { active = false; cancelAnimationFrame(animFrame); };
     }
-    function initTilt() {
-      setTimeout(() => {
-        const g = document.getElementById('tilt-grid');
-        if (!g) return;
-        g.addEventListener('mousemove', e => {
-          g.querySelectorAll('.t-card').forEach(card => {
-            const r = card.getBoundingClientRect();
-            const dx = (e.clientX - r.left - r.width / 2) / r.width * 18;
-            const dy = (e.clientY - r.top - r.height / 2) / r.height * 18;
-            card.style.transform = `perspective(600px) rotateY(${dx}deg) rotateX(${-dy}deg) scale(1.05)`;
-          });
-        });
-        g.addEventListener('mouseleave', () => g.querySelectorAll('.t-card').forEach(c => c.style.transform = ''));
-      }, 100);
-    }
+    
   </script>
 </body>
 
