@@ -430,9 +430,9 @@
       {
         name: '박소은 / Soeun Park', genre: 'Oriental Paint', works: '— works', color: '#12201a', display: 'b',
         adjectives: ['자기소개'],
-        html: `<div class="display-b"><div class="tilt-grid" id="tilt-grid">
-        <a class="t-card" href="#" style="background-image:url('soeun/work1.png'); background-size:contain; background-repeat:no-repeat; background-position:top left; background-color:#f8f7f4;"></a>
-      </div></div>`,
+        html: `<div style="position:relative; width:100%; height:100%;">
+  <img id="soeun-hand" src="soeun/work1.png" style="width:300px; height:auto; position:absolute; top:2rem; left:2rem; transform-origin:center center; transition:transform 0.1s ease;">
+</div>`,
       },
       {
         name: '유영선', genre: 'Multimedia', works: '3 works', color: '#147bb7', display: 'c',
@@ -867,6 +867,7 @@ function closeArtist() {
 
       let mouseX = -999, mouseY = -999;
       let isHovering = false;
+      let hoveredLink = null;
       canvas.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
 
 
@@ -962,7 +963,19 @@ canvas.addEventListener('click', e => {
       loop();
       canvas._stop = () => { active = false; cancelAnimationFrame(animFrame); };
     }
-    
+    function initTilt() {
+      setTimeout(() => {
+        const img = document.getElementById('soeun-hand');
+        if (!img) return;
+        document.getElementById('page-artist').addEventListener('mousemove', e => {
+          const r = img.getBoundingClientRect();
+          const cx = r.left + r.width / 2;
+          const cy = r.top + r.height / 2;
+          const angle = Math.atan2(e.clientY - cy, e.clientX - cx) * 180 / Math.PI;
+          img.style.transform = `rotate(${angle}deg)`;
+        });
+      }, 100);
+    }
   </script>
 </body>
 
