@@ -581,22 +581,23 @@
     }
 
 function closeArtist() {
-      if (window._fliesAbort) { window._fliesAbort.abort(); window._fliesAbort = null; }
+  if (window._fliesAbort) { window._fliesAbort.abort(); window._fliesAbort = null; }
   const fc = document.getElementById('fly-canvas');
   if (fc && fc._stop) { fc._stop(); fc._stop = null; }
-  if (fc) fc.style.display = 'none';
+  if (fc) { fc.style.display = 'none'; fc.width = 1; }
   const bc = document.getElementById('bounce-canvas');
   if (bc && bc._stop) { bc._stop(); bc._stop = null; }
   cursor.classList.remove('hover');
-  // 모든 타일 상태 리셋
-  document.querySelectorAll('.tile-back').forEach(back => {
-    if (back._stopAnim) back._stopAnim();
-    back.style.clipPath = 'circle(0% at 50% 50%)';
-    back.style.transition = 'none';
-    back._filled = false;
-  });
   document.getElementById('page-artist').classList.remove('visible');
+  // stage의 타일만 리셋 (페이지 내부 타일 제외)
+  document.querySelectorAll('#stage .tile-back').forEach(back => {
+    if (back._stopAnim) back._stopAnim();
+    back._filled = false;
+    back.style.transition = 'clip-path 0.5s cubic-bezier(0.22, 1, 0.36, 1)';
+    back.style.clipPath = 'circle(0% at 50% 50%)';
+  });
 }
+
 
     function initDrag() {
       const track = document.getElementById('track-0');
@@ -704,7 +705,9 @@ function closeArtist() {
       }
 
       let animFrame;
+      let active = true;
       function loop() {
+        if (!active) return;
         Array.from(document.querySelectorAll('.w-item')).forEach((el, i) => {
           if (!itemRects[i]) return;
           const r = el.getBoundingClientRect();
@@ -767,7 +770,7 @@ function closeArtist() {
       }
 
       loop();
-      canvas._stop = () => cancelAnimationFrame(animFrame);
+      canvas._stop = () => { active = false; cancelAnimationFrame(animFrame); };
     }
 
     function initBounce() {
@@ -870,8 +873,10 @@ function closeArtist() {
       canvas.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
 
 
-      let animFrame;
+let animFrame;
+      let active = true;
       function loop() {
+        if (!active) return;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         balls.forEach(b => {
@@ -941,7 +946,7 @@ function closeArtist() {
         }
       });
       loop();
-      canvas._stop = () => cancelAnimationFrame(animFrame);
+      canvas._stop = () => { active = false; cancelAnimationFrame(animFrame); };
     }
     function initTilt() {
       setTimeout(() => {
