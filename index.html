@@ -589,6 +589,7 @@ function closeArtist() {
   if (bc && bc._stop) { bc._stop(); bc._stop = null; }
   cursor.classList.remove('hover');
   document.getElementById('page-artist').classList.remove('visible');
+  document.getElementById('artist-works').innerHTML = '';
   // stage의 타일만 리셋 (페이지 내부 타일 제외)
   document.querySelectorAll('#stage .tile-back').forEach(back => {
     if (back._stopAnim) back._stopAnim();
