@@ -409,6 +409,12 @@
       if (e.target.closest('.tile, .back-btn')) cursor.classList.add('hover');
       else cursor.classList.remove('hover');
     });
+    
+    // 유영선 이미지 preload
+    ['youngsun/player.jpeg', 'youngsun/stone.jpeg', 'youngsun/makeup.jpeg'].forEach(src => {
+      const img = new Image();
+      img.src = src;
+    });
 
     const artists = [
       {
