@@ -580,13 +580,21 @@
       if (a.display === 'minseo') setTimeout(initBounce, 300);
     }
 
-    function closeArtist() {
+function closeArtist() {
+      if (window._fliesAbort) { window._fliesAbort.abort(); window._fliesAbort = null; }
   const fc = document.getElementById('fly-canvas');
   if (fc && fc._stop) { fc._stop(); fc._stop = null; }
   if (fc) fc.style.display = 'none';
   const bc = document.getElementById('bounce-canvas');
   if (bc && bc._stop) { bc._stop(); bc._stop = null; }
   cursor.classList.remove('hover');
+  // 모든 타일 상태 리셋
+  document.querySelectorAll('.tile-back').forEach(back => {
+    if (back._stopAnim) back._stopAnim();
+    back.style.clipPath = 'circle(0% at 50% 50%)';
+    back.style.transition = 'none';
+    back._filled = false;
+  });
   document.getElementById('page-artist').classList.remove('visible');
 }
 
@@ -600,6 +608,9 @@
     }
 
     function initFlies() {
+      if (window._fliesAbort) window._fliesAbort.abort();
+      window._fliesAbort = new AbortController();
+      const signal = window._fliesAbort.signal;
       const canvas = document.getElementById('fly-canvas');
     if (!canvas) return;
     canvas.style.position = 'fixed';
@@ -651,10 +662,9 @@
 
       let mx = -999, my = -999;
 
-      document.getElementById('page-artist').addEventListener('mousemove', e => {
+        document.getElementById('page-artist').addEventListener('mousemove', e => {
         mx = e.clientX;
         my = e.clientY;
-        const items = document.querySelectorAll('.w-item');
         Array.from(document.querySelectorAll('.w-item')).forEach((el, i) => {
           if (!itemRects[i]) return;
           const r = el.getBoundingClientRect();
@@ -665,8 +675,8 @@
           itemRects[i].width = r.width;
           itemRects[i].height = r.height;
         });
-      });
-      document.getElementById('page-artist').addEventListener('mouseleave', () => { mx = -999; my = -999; });
+      }, { signal });
+      document.getElementById('page-artist').addEventListener('mouseleave', () => { mx = -999; my = -999; }, { signal });
 
 
       function drawFly(f) {
