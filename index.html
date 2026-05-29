@@ -491,7 +491,6 @@
       const word = isSoon ? `미정 ${soonIdx}` : a.adjectives[0];
       const backName = isSoon ? 'Soon' : a.name;
       const backGenre = isSoon ? '' : a.genre;
-      const backIndex = isSoon ? '—' : `0${aIdx + 1}`;
       const backBg = isSoon ? '#161616' : a.color;
 
       tile.innerHTML = `
@@ -500,7 +499,6 @@
           <span class="tile-front-word">${word}</span>
         </div>
         <div class="tile-back" style="background:${backBg}">
-          <div class="tile-back-index">${backIndex}</div>
           <div class="tile-back-name">${backName}</div>
           <div class="tile-back-genre">${backGenre}</div>
         </div>
