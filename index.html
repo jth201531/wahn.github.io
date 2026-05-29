@@ -403,7 +403,6 @@
     document.addEventListener('mousemove', e => { cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px'; });
     document.addEventListener('mouseover', e => {
       if (window._soeunCanvas) {
-        // 소은 페이지: 헤더 위면 비활성화, 아니면 활성화
         if (e.target.closest('header, .artist-page-header, .back-btn')) cursor.classList.remove('hover');
         else cursor.classList.add('hover');
         return;
@@ -601,7 +600,7 @@ function closeArtist() {
   const bc = document.getElementById('bounce-canvas');
   if (bc && bc._stop) { bc._stop(); bc._stop = null; }
   cursor.classList.remove('hover');
-  docudocument.getElementById('page-artist').style.background = 'var(--bg)';
+  document.getElementById('page-artist').style.background = 'var(--bg)';
   document.getElementById('page-artist').style.color = '';
   document.getElementById('header-artist-name').style.color = '';
   document.getElementById('artist-meta').style.color = '';
@@ -1121,13 +1120,14 @@ canvas.addEventListener('click', e => {
           chargeLevel = 0;
         });
 
-        beamCanvas._remove = () => {
+       beamCanvas._remove = () => {
           cursor.classList.remove('hover');
           cursor.style.borderColor = '';
           const s = document.getElementById('soeun-cursor-style');
           if (s) s.remove();
           beamCanvas.remove();
         };
+
         window._soeunCanvas = beamCanvas;
       }, 100);
     }
