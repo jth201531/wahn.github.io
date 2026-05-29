@@ -600,6 +600,14 @@
     }
 
     function initFlies() {
+      const canvas = document.getElementById('fly-canvas');
+    if (!canvas) return;
+    canvas.style.position = 'fixed';
+    canvas.style.top = '0';
+    canvas.style.left = '0';
+    canvas.width = window.innerWidth;
+    canvas.height = document.documentElement.clientHeight;
+    const ctx = canvas.getContext('2d');
       const stage = document.getElementById('fly-stage');
 
       const FLY_COUNT = 600;
@@ -755,7 +763,6 @@
     function initBounce() {
   const oldCanvas = document.getElementById('bounce-canvas');
   if (!oldCanvas) return;
-  // 이벤트 리스너 중복 방지를 위해 canvas 복제
   const canvas = oldCanvas.cloneNode(false);
   oldCanvas.parentNode.replaceChild(canvas, oldCanvas);
   canvas.style.position = 'fixed';
@@ -764,6 +771,7 @@
   canvas.width = window.innerWidth;
   canvas.height = document.documentElement.clientHeight;
   const ctx = canvas.getContext('2d');
+
       const images = [
         { src: 'minseo/work1.png', link: 'https://www.instagram.com/p/DJdxyALp1SL/' },
         { src: 'minseo/work2.png', link: 'https://www.instagram.com/p/DJdx163Jp7h/' },
