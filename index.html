@@ -403,7 +403,8 @@
     document.addEventListener('mousemove', e => { cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px'; });
     document.addEventListener('mouseover', e => {
       if (window._soeunCanvas) {
-        if (e.target.closest('header, .artist-page-header, .back-btn')) cursor.classList.remove('hover');
+        if (e.target.closest('.back-btn')) cursor.classList.add('hover');
+        else if (e.target.closest('.artist-page-header')) cursor.classList.remove('hover');
         else cursor.classList.add('hover');
         return;
       }
