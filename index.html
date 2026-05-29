@@ -601,7 +601,12 @@ function closeArtist() {
   const bc = document.getElementById('bounce-canvas');
   if (bc && bc._stop) { bc._stop(); bc._stop = null; }
   cursor.classList.remove('hover');
-  document.getElementById('page-artist').style.background = 'var(--bg)';
+  docudocument.getElementById('page-artist').style.background = 'var(--bg)';
+  document.getElementById('page-artist').style.color = '';
+  document.getElementById('header-artist-name').style.color = '';
+  document.getElementById('artist-meta').style.color = '';
+  document.querySelector('.back-btn').style.color = '';
+  document.querySelector('.artist-page-header').style.borderColor = '';
   document.getElementById('page-artist').classList.remove('visible');
   document.getElementById('artist-works').innerHTML = '';
   document.querySelectorAll('#stage .tile-back').forEach(back => {
