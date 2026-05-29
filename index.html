@@ -10,7 +10,7 @@
     rel="stylesheet">
   <style>
     :root {
-      --bg: #f5f3ef;
+      --bg: #ffffff;
       --fg: #1a1a1a;
       --muted: #999794;
       --border: rgba(26, 26, 26, 0.1);
@@ -73,7 +73,6 @@
       justify-content: flex-start;
       align-items: baseline;
       z-index: 50;
-      pointer-events: none;
     }
 
     .logo {
@@ -86,7 +85,7 @@
     .header-right {
       font-size: 11px;
       letter-spacing: 0.1em;
-      color: var(--muted);
+      color: #000000;
       text-transform: uppercase;
     }
 
@@ -115,7 +114,7 @@
     }
 
     .tile-front {
-      background: #ece9e4;
+      background: #f0f0f0;
       border: 1px solid rgba(26, 26, 26, 0.08);
       display: flex;
       align-items: center;
@@ -381,7 +380,7 @@
 <body>
   <div class="cursor" id="cursor"></div>
   <header>
-    <span class="logo">Wahn</span>
+    <a class="logo" href="https://www.instagram.com/wahn_.lab/?utm_source=ig_web_button_share_sheet" target="_blank" style="text-decoration:none; color:inherit;">Wahn</a>
     <span class="header-right" style="position:fixed; bottom:2rem; right:2.5rem;">Archive</span>
   </header>
   <div id="stage"></div>
@@ -406,10 +405,10 @@
     const cursor = document.getElementById('cursor');
     document.addEventListener('mousemove', e => { cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px'; });
     document.addEventListener('mouseover', e => {
-      if (e.target.closest('.tile, .back-btn')) cursor.classList.add('hover');
+      if (e.target.closest('.tile, .back-btn, a.logo')) cursor.classList.add('hover');
       else cursor.classList.remove('hover');
     });
-    
+
     // 유영선 이미지 preload
     ['youngsun/player.jpeg', 'youngsun/stone.jpeg', 'youngsun/makeup.jpeg',
      'minseo/work1.png', 'minseo/work2.png', 'minseo/work3.png', 'minseo/work4.png', 'minseo/work5.png'
@@ -877,6 +876,7 @@ function closeArtist() {
       const BOUNDS_H = canvas.height;
 
       let mouseX = -999, mouseY = -999;
+      let isHovering = false;
       canvas.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
 
 
@@ -929,13 +929,27 @@ let animFrame;
           const px = Math.round((mouseX - rect.left) * scaleX);
           const py = Math.round((mouseY - rect.top) * scaleY);
           const pixel = ctx.getImageData(px, py, 1, 1).data;
-          if (pixel[3] > 20) cursor.classList.add('hover');
-          else cursor.classList.remove('hover');
+          if (pixel[3] > 20) {
+            cursor.classList.add('hover');
+            isHovering = true;
+            for (const b of balls) {
+              if (mouseX > b.x && mouseX < b.x + b.w && mouseY > b.y && mouseY < b.y + b.h) {
+                hoveredLink = b.link;
+                break;
+              }
+            }
+          } else {
+            cursor.classList.remove('hover');
+            isHovering = false;
+            hoveredLink = null;
+          }
         }
 
         animFrame = requestAnimationFrame(loop);
       }
-      canvas.addEventListener('click', e => {
+
+canvas.addEventListener('click', e => {
+        if (!isHovering) return;
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
@@ -950,8 +964,11 @@ let animFrame;
               break;
             }
           }
+        } else if (hoveredLink) {
+          window.open(hoveredLink, '_blank');
         }
       });
+
       loop();
       canvas._stop = () => { active = false; cancelAnimationFrame(animFrame); };
     }
