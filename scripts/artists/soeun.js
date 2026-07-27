@@ -17,7 +17,20 @@ function initSoeun() {
         window.cursor.style.setProperty('--cursor-color', '#fff');
         const cursorStyle = document.createElement('style');
         cursorStyle.id = 'soeun-cursor-style';
-        cursorStyle.textContent = '.cursor { --cursor-color: #fff; } .cursor.hover { background: transparent !important; }';
+        cursorStyle.textContent = `
+          .cursor {
+            --cursor-color: #fff;
+            mix-blend-mode: difference !important;
+            opacity: 1 !important;
+          }
+          .cursor-dot,
+          .cursor-piece {
+            background: #fff !important;
+          }
+          .cursor.hover {
+            background: transparent !important;
+          }
+        `;
         document.head.appendChild(cursorStyle);
 
         const beamCanvas = document.createElement('canvas');

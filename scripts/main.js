@@ -39,13 +39,14 @@ const cursor = document.getElementById('cursor');
     const H = window.innerHeight;
     const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
     const isMobileViewport = W < 760;
-    const shopColumns = isMobileViewport ? 2 : Math.min(4, Math.max(1, mainArtists.length));
+    const desktopColumns = W < 1080 ? 3 : 4;
+    const shopColumns = isMobileViewport ? 2 : Math.min(desktopColumns, Math.max(1, mainArtists.length));
     const shopRows = Math.max(1, Math.ceil(mainArtists.length / shopColumns));
     const baseRecordSize = isMobileViewport ? clamp(W * 0.36, 132, 172) : 178;
     const shopGapX = isMobileViewport ? clamp(W * 0.48, 176, 222) : 260;
     const shopGapY = isMobileViewport ? 248 : 282;
-    const mapWidth = Math.max(W * 1.35, shopColumns * shopGapX + 380);
-    const mapHeight = Math.max(H * 1.2, shopRows * shopGapY + 610);
+    const mapWidth = isMobileViewport ? Math.max(W, shopColumns * shopGapX + 220) : W;
+    const mapHeight = isMobileViewport ? Math.max(H, shopRows * shopGapY + 420) : H;
     const rackPad = isMobileViewport ? 54 : 126;
     const visibleColumns = Math.min(shopColumns, Math.max(1, mainArtists.length));
     const shopRackWidth = Math.min(mapWidth - rackPad * 2, (visibleColumns - 1) * shopGapX + baseRecordSize + (isMobileViewport ? 112 : 220));
@@ -202,11 +203,13 @@ const cursor = document.getElementById('cursor');
     }
 
     function clampMapX(x) {
+      if (mapWidth <= W) return 0;
       const pad = mapPad();
       return clamp(x, W - mapWidth - pad, pad);
     }
 
     function clampMapY(y) {
+      if (mapHeight <= H) return 0;
       const pad = mapPad();
       return clamp(y, H - mapHeight - pad, pad);
     }
