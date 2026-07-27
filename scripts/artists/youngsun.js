@@ -5,20 +5,20 @@ window.artists.push({
         html: `<div class="display-c youngsun-main-page" id="fly-stage" aria-label="유영선 메인 영역">
   <div class="youngsun-object-field">
     <button class="youngsun-object youngsun-object-ttori" type="button" data-youngsun-work="ttori" aria-label="또리는 강쥐">
-      <span class="youngsun-object-fill" aria-hidden="true"><img src="youngsun/또리는 강쥐/또리.png" alt=""></span>
-      <img class="youngsun-object-img" src="youngsun/또리는 강쥐/또리.png" alt="">
+      <span class="youngsun-object-fill" aria-hidden="true"><img src="youngsun/또리는 강쥐/또리.png" alt=""></span>
+      <img class="youngsun-object-img" src="youngsun/또리는 강쥐/또리.png" alt="">
     </button>
   </div>
   <section class="youngsun-work-detail" data-youngsun-detail="ttori" aria-hidden="true">
     <button class="youngsun-ttori-wanderer" type="button" data-ttori-wanderer aria-label="또리 계약서 떨어뜨리기">
-      <img class="youngsun-ttori-wanderer-img" data-ttori-img data-run-src="youngsun/또리는 강쥐/또리.png" data-sit-src="youngsun/또리는 강쥐/앉은 또리.png" src="youngsun/또리는 강쥐/또리.png" alt="">
+      <img class="youngsun-ttori-wanderer-img" data-ttori-img data-run-src="youngsun/또리는 강쥐/또리.png" data-sit-src="youngsun/또리는 강쥐/앉은 또리.png" src="youngsun/또리는 강쥐/또리.png" alt="">
     </button>
     <button class="youngsun-contract-drop" type="button" data-ttori-contract aria-label="또리 입양 계약서 보기">
-      <img src="youngsun/또리는 강쥐/계약서.png" alt="">
+      <img src="youngsun/또리는 강쥐/계약서.png" alt="">
     </button>
     <div class="youngsun-pdf-panel" data-ttori-pdf-panel aria-hidden="true">
       <button class="youngsun-pdf-close" type="button" data-ttori-pdf-close aria-label="계약서 닫기">×</button>
-      <iframe class="youngsun-pdf-frame" src="youngsun/또리는 강쥐/또리 입양 계약서.pdf" title="또리 입양 계약서"></iframe>
+      <iframe class="youngsun-pdf-frame" src="youngsun/또리는 강쥐/또리 입양 계약서.pdf" title="또리 입양 계약서"></iframe>
     </div>
     <div class="youngsun-work-detail-title">또리는 강쥐</div>
   </section>
@@ -32,7 +32,7 @@ const YOUNGSUN_WORK_META = {
   },
 };
 
-const YOUNGSUN_TTORI_TRANSITION_IMAGE = 'youngsun/또리는 강쥐/ttori-front-cropped.webp';
+const YOUNGSUN_TTORI_TRANSITION_IMAGE = 'youngsun/또리는 강쥐/ttori-front-cropped.webp';
 const YOUNGSUN_TTORI_TRANSITION_RATIO = 173 / 225;
 const YOUNGSUN_LAYOUT_KEY = 'wahn-youngsun-layout-v1';
 const YOUNGSUN_CAPTION_KEY = 'wahn-youngsun-captions-v1';

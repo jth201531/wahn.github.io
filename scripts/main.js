@@ -24,11 +24,11 @@ const cursor = document.getElementById('cursor');
     });
 
     // 유영선 이미지 preload
-    ['youngsun/또리는 강쥐/또리.png',
-     'youngsun/또리는 강쥐/ttori-front-cropped.webp',
-     'youngsun/또리는 강쥐/또리 전경-white-wall-no-ttori-screen.png',
-     'youngsun/또리는 강쥐/앉은 또리.png',
-     'youngsun/또리는 강쥐/계약서.png',
+    ['youngsun/또리는 강쥐/또리.png',
+     'youngsun/또리는 강쥐/ttori-front-cropped.webp',
+     'youngsun/또리는 강쥐/또리 전경-white-wall-no-ttori-screen.png',
+     'youngsun/또리는 강쥐/앉은 또리.png',
+     'youngsun/또리는 강쥐/계약서.png',
      'minseo/work1.png', 'minseo/work2.png', 'minseo/work3.png', 'minseo/work4.png', 'minseo/work5.png'
     ].forEach(src => {
       const img = new Image();
