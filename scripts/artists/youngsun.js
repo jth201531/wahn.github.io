@@ -2,28 +2,405 @@ window.artists = window.artists || [];
 window.artists.push({
         name: '유영선', genre: 'Multimedia', works: '3 works', color: '#147bb7', display: 'c',
         adjectives: ['자기소개'],
-        html: `<div class="display-c" id="fly-stage">
-  <div class="work-grid youngsun-layout">
-    <a class="w-item youngsun-work youngsun-work-player" href="#" aria-label="Youngsun work player"><span class="youngsun-caption">&lt;12번째 선수&gt;, 2채널, 2025</span></a>
-    <a class="w-item youngsun-work youngsun-work-stone" href="#" aria-label="Youngsun work stone"><span class="youngsun-caption">&lt;돌이 되기&gt;, 알루미늄 호일, 2025</span></a>
-    <a class="w-item youngsun-work youngsun-work-makeup" href="#" aria-label="Youngsun work makeup"><span class="youngsun-caption">&lt;화장 따라하기&gt;, 원형 스크린에 1채널, 2025</span></a>
+        html: `<div class="display-c youngsun-main-page" id="fly-stage" aria-label="유영선 메인 영역">
+  <div class="youngsun-object-field">
+    <button class="youngsun-object youngsun-object-ttori" type="button" data-youngsun-work="ttori" aria-label="또리는 강쥐">
+      <span class="youngsun-object-fill" aria-hidden="true"><img src="youngsun/또리는 강쥐/또리.png" alt=""></span>
+      <img class="youngsun-object-img" src="youngsun/또리는 강쥐/또리.png" alt="">
+    </button>
   </div>
+  <section class="youngsun-work-detail" data-youngsun-detail="ttori" aria-hidden="true">
+    <button class="youngsun-ttori-wanderer" type="button" data-ttori-wanderer aria-label="또리 계약서 떨어뜨리기">
+      <img class="youngsun-ttori-wanderer-img" data-ttori-img data-run-src="youngsun/또리는 강쥐/또리.png" data-sit-src="youngsun/또리는 강쥐/앉은 또리.png" src="youngsun/또리는 강쥐/또리.png" alt="">
+    </button>
+    <button class="youngsun-contract-drop" type="button" data-ttori-contract aria-label="또리 입양 계약서 보기">
+      <img src="youngsun/또리는 강쥐/계약서.png" alt="">
+    </button>
+    <div class="youngsun-pdf-panel" data-ttori-pdf-panel aria-hidden="true">
+      <button class="youngsun-pdf-close" type="button" data-ttori-pdf-close aria-label="계약서 닫기">×</button>
+      <iframe class="youngsun-pdf-frame" src="youngsun/또리는 강쥐/또리 입양 계약서.pdf" title="또리 입양 계약서"></iframe>
+    </div>
+    <div class="youngsun-work-detail-title">또리는 강쥐</div>
+  </section>
 </div>`,
         init: initYoungsun
       });
 
+const YOUNGSUN_WORK_META = {
+  ttori: {
+    caption: '<또리는 강쥐>, 2022, 벽면에 흑연, 가변설치',
+  },
+};
+
+const YOUNGSUN_TTORI_TRANSITION_IMAGE = 'youngsun/또리는 강쥐/ttori-front-cropped.webp';
+const YOUNGSUN_TTORI_TRANSITION_RATIO = 173 / 225;
 const YOUNGSUN_LAYOUT_KEY = 'wahn-youngsun-layout-v1';
 const YOUNGSUN_CAPTION_KEY = 'wahn-youngsun-captions-v1';
 const YOUNGSUN_WORK_CLASSES = ['youngsun-work-player', 'youngsun-work-stone', 'youngsun-work-makeup'];
 
 function initYoungsun() {
-  applyYoungsunSavedLayout();
-  applyYoungsunSavedCaptions();
-  if (new URLSearchParams(window.location.search).get('edit') === 'youngsun') {
-    initYoungsunLayoutEditor();
+  if (window._fliesAbort) { window._fliesAbort.abort(); window._fliesAbort = null; }
+  if (window._youngsunEditorAbort) { window._youngsunEditorAbort.abort(); window._youngsunEditorAbort = null; }
+  document.body.classList.remove('youngsun-editing');
+  const flyCanvas = document.getElementById('fly-canvas');
+  if (flyCanvas) {
+    if (flyCanvas._stop) { flyCanvas._stop(); flyCanvas._stop = null; }
+    flyCanvas.style.display = 'none';
+    flyCanvas.width = 1;
+    flyCanvas.height = 1;
   }
-  document.getElementById('fly-canvas').style.display = 'block';
-  setTimeout(initYoungsunFlies, 1000);
+  restoreYoungsunArtistHeader();
+  initYoungsunMainObjects();
+}
+
+function initYoungsunMainObjects() {
+  const stage = document.querySelector('.youngsun-main-page');
+  if (!stage) return;
+  const fillDuration = 1050;
+
+  stage.querySelectorAll('.youngsun-object').forEach(object => {
+    let fillTimer = null;
+
+    const resetFill = () => {
+      clearTimeout(fillTimer);
+      object.classList.remove('is-filling', 'is-filled');
+      object.setAttribute('aria-pressed', 'false');
+    };
+
+    object.addEventListener('pointerenter', () => {
+      clearTimeout(fillTimer);
+      object.classList.add('is-filling');
+      fillTimer = setTimeout(() => {
+        object.classList.add('is-filled');
+        object.setAttribute('aria-pressed', 'true');
+      }, fillDuration);
+    });
+
+    object.addEventListener('pointerleave', () => {
+      if (!stage.classList.contains('is-work-open') && !stage.classList.contains('is-work-transitioning')) resetFill();
+    });
+
+    object.addEventListener('click', e => {
+      if (!object.classList.contains('is-filled')) {
+        e.preventDefault();
+        return;
+      }
+      startYoungsunWorkTransition(stage, object, object.dataset.youngsunWork);
+    });
+  });
+
+  stage.querySelectorAll('[data-youngsun-back]').forEach(button => {
+    button.addEventListener('click', () => closeYoungsunWork(stage));
+  });
+
+  initYoungsunTtoriInteraction(stage);
+}
+
+function startYoungsunWorkTransition(stage, object, workId) {
+  const detail = stage.querySelector(`[data-youngsun-detail="${workId}"]`);
+  if (!detail || stage.classList.contains('is-work-open') || stage.classList.contains('is-work-transitioning')) return;
+
+  clearYoungsunWorkTransition(stage, { resetObjects: false, immediate: true });
+
+  const stageRect = stage.getBoundingClientRect();
+  const objectRect = object.getBoundingClientRect();
+  const startHeight = objectRect.height;
+  const startWidth = startHeight * YOUNGSUN_TTORI_TRANSITION_RATIO;
+  const startLeft = objectRect.left - stageRect.left + objectRect.width / 2 - startWidth / 2;
+  const startTop = objectRect.top - stageRect.top + objectRect.height / 2 - startHeight / 2;
+  const overlay = document.createElement('div');
+  overlay.className = 'youngsun-work-transition';
+  overlay.style.setProperty('--transition-start-left', `${startLeft}px`);
+  overlay.style.setProperty('--transition-start-top', `${startTop}px`);
+  overlay.style.setProperty('--transition-start-width', `${startWidth}px`);
+  overlay.style.setProperty('--transition-start-height', `${startHeight}px`);
+  overlay.innerHTML = `
+    <div class="youngsun-work-transition-image" aria-hidden="true">
+      <img src="${YOUNGSUN_TTORI_TRANSITION_IMAGE}" alt="">
+    </div>
+    <button class="youngsun-transition-gate" type="button" aria-label="또리는 강쥐 진입 취소">
+      <svg viewBox="0 0 48 48" aria-hidden="true">
+        <circle class="gate-base" cx="24" cy="24" r="19.5"></circle>
+        <circle class="gate-progress" cx="24" cy="24" r="19.5"></circle>
+        <g class="gate-x">
+          <line class="gate-x-line" x1="18" y1="18" x2="30" y2="30"></line>
+          <line class="gate-x-line" x1="30" y1="18" x2="18" y2="30"></line>
+        </g>
+      </svg>
+    </button>`;
+
+  const gate = overlay.querySelector('.youngsun-transition-gate');
+  const progress = overlay.querySelector('.gate-progress');
+  let didOpen = false;
+
+  stage._youngsunWorkTransitionOverlay = overlay;
+  stage._youngsunWorkTransitionTimers = [];
+  stage.classList.add('is-work-transitioning');
+  object.classList.add('is-opening');
+  object.disabled = true;
+  stage.appendChild(overlay);
+
+  const cancel = event => {
+    event?.preventDefault();
+    event?.stopPropagation();
+    if (didOpen) return;
+    clearYoungsunWorkTransition(stage, { resetObjects: true });
+  };
+
+  const finish = () => {
+    if (didOpen) return;
+    if (!stage.classList.contains('is-work-transitioning') || stage._youngsunWorkTransitionOverlay !== overlay) return;
+    didOpen = true;
+    clearYoungsunWorkTransitionTimers(stage);
+    if (!document.body.contains(stage)) return;
+    overlay.classList.add('is-exit');
+    gate.classList.add('exit');
+    openYoungsunWork(stage, workId);
+    stage.classList.remove('is-work-transitioning');
+    object.classList.remove('is-opening');
+    object.disabled = false;
+    window.cursor?.classList.remove('hover');
+    stage._youngsunWorkTransitionOverlay = null;
+    window.setTimeout(() => overlay.remove(), 620);
+  };
+
+  gate.addEventListener('click', cancel);
+  progress.addEventListener('animationend', finish, { once: true });
+
+  requestAnimationFrame(() => overlay.classList.add('is-active'));
+  setYoungsunWorkTransitionTimer(stage, () => {
+    if (!stage.classList.contains('is-work-transitioning')) return;
+    gate.classList.add('visible');
+    requestAnimationFrame(() => gate.classList.add('filling'));
+  }, 880);
+  setYoungsunWorkTransitionTimer(stage, finish, 2700);
+}
+
+function setYoungsunWorkTransitionTimer(stage, fn, delay) {
+  stage._youngsunWorkTransitionTimers = stage._youngsunWorkTransitionTimers || [];
+  const timer = window.setTimeout(() => {
+    stage._youngsunWorkTransitionTimers = (stage._youngsunWorkTransitionTimers || []).filter(id => id !== timer);
+    fn();
+  }, delay);
+  stage._youngsunWorkTransitionTimers.push(timer);
+  return timer;
+}
+
+function clearYoungsunWorkTransitionTimers(stage) {
+  (stage._youngsunWorkTransitionTimers || []).forEach(timer => clearTimeout(timer));
+  stage._youngsunWorkTransitionTimers = [];
+}
+
+function clearYoungsunWorkTransition(stage, { resetObjects = true, immediate = false } = {}) {
+  if (!stage) return;
+  clearYoungsunWorkTransitionTimers(stage);
+  const overlay = stage._youngsunWorkTransitionOverlay;
+  stage.classList.remove('is-work-transitioning');
+  stage.querySelectorAll('.youngsun-object').forEach(object => {
+    object.classList.remove('is-opening');
+    object.disabled = false;
+    if (resetObjects) {
+      object.classList.remove('is-filling', 'is-filled');
+      object.setAttribute('aria-pressed', 'false');
+    }
+  });
+  window.cursor?.classList.remove('hover');
+
+  if (!overlay) return;
+  stage._youngsunWorkTransitionOverlay = null;
+  if (immediate) {
+    overlay.remove();
+    return;
+  }
+  overlay.classList.add('is-canceling');
+  window.setTimeout(() => overlay.remove(), 420);
+}
+
+function openYoungsunWork(stage, workId) {
+  const detail = stage.querySelector(`[data-youngsun-detail="${workId}"]`);
+  if (!detail) return;
+  stage.classList.add('is-work-open');
+  stage.querySelectorAll('.youngsun-work-detail').forEach(panel => {
+    const active = panel === detail;
+    panel.classList.toggle('is-visible', active);
+    panel.setAttribute('aria-hidden', active ? 'false' : 'true');
+  });
+  setYoungsunWorkHeader(stage, workId);
+  if (workId === 'ttori') startYoungsunTtoriIntro(stage);
+}
+
+function closeYoungsunWork(stage) {
+  clearYoungsunWorkTransition(stage, { resetObjects: true, immediate: true });
+  stage.classList.remove('is-work-open');
+  stage.querySelectorAll('.youngsun-work-detail').forEach(panel => {
+    panel.classList.remove('is-visible');
+    panel.setAttribute('aria-hidden', 'true');
+  });
+  stage.querySelectorAll('.youngsun-object').forEach(object => {
+    object.classList.remove('is-filling', 'is-filled');
+    object.setAttribute('aria-pressed', 'false');
+  });
+  resetYoungsunTtori(stage);
+  restoreYoungsunArtistHeader();
+}
+
+function initYoungsunTtoriInteraction(stage) {
+  const detail = stage.querySelector('[data-youngsun-detail="ttori"]');
+  const ttori = detail?.querySelector('[data-ttori-wanderer]');
+  const contract = detail?.querySelector('[data-ttori-contract]');
+  const pdfClose = detail?.querySelector('[data-ttori-pdf-close]');
+  if (!detail || !ttori || !contract || !pdfClose) return;
+
+  resetYoungsunTtori(stage);
+  ttori.addEventListener('click', () => triggerYoungsunTtoriDrop(stage));
+  contract.addEventListener('click', () => openYoungsunTtoriPdf(stage));
+  pdfClose.addEventListener('click', e => {
+    e.preventDefault();
+    closeYoungsunTtoriPdf(stage);
+  });
+}
+
+function resetYoungsunTtori(stage) {
+  const detail = stage?.querySelector('[data-youngsun-detail="ttori"]');
+  const ttori = detail?.querySelector('[data-ttori-wanderer]');
+  const ttoriImg = detail?.querySelector('[data-ttori-img]');
+  const contract = detail?.querySelector('[data-ttori-contract]');
+  const pdfPanel = detail?.querySelector('[data-ttori-pdf-panel]');
+  if (!detail || !ttori || !ttoriImg || !contract || !pdfPanel) return;
+
+  clearTimeout(stage._ttoriStartTimer);
+  clearTimeout(stage._ttoriSitTimer);
+  clearTimeout(stage._ttoriContractReadyTimer);
+  detail.classList.remove('is-ttori-ready', 'is-ttori-intro', 'is-contract-dropping', 'is-ttori-settled', 'is-contract-ready', 'is-pdf-open');
+  ttori.classList.remove('is-paused', 'is-sitting');
+  ttori.disabled = false;
+  ttori.removeAttribute('style');
+  contract.classList.remove('is-dropping');
+  contract.disabled = true;
+  contract.removeAttribute('style');
+  pdfPanel.setAttribute('aria-hidden', 'true');
+  ttoriImg.src = ttoriImg.dataset.runSrc;
+}
+
+function startYoungsunTtoriIntro(stage) {
+  const detail = stage?.querySelector('[data-youngsun-detail="ttori"]');
+  if (!detail) return;
+
+  resetYoungsunTtori(stage);
+  detail.classList.add('is-ttori-intro');
+  clearTimeout(stage._ttoriStartTimer);
+  stage._ttoriStartTimer = setTimeout(() => {
+    if (!detail.classList.contains('is-visible') || detail.classList.contains('is-contract-dropping')) return;
+    detail.classList.remove('is-ttori-intro');
+    detail.classList.add('is-ttori-ready');
+  }, 1000);
+}
+
+function triggerYoungsunTtoriDrop(stage) {
+  const detail = stage.querySelector('[data-youngsun-detail="ttori"]');
+  const ttori = detail?.querySelector('[data-ttori-wanderer]');
+  const ttoriImg = detail?.querySelector('[data-ttori-img]');
+  const contract = detail?.querySelector('[data-ttori-contract]');
+  if (!detail || !ttori || !ttoriImg || !contract) return;
+  if (!detail.classList.contains('is-visible') || detail.classList.contains('is-contract-dropping')) return;
+
+  const detailRect = detail.getBoundingClientRect();
+  const ttoriRect = ttori.getBoundingClientRect();
+  const left = ttoriRect.left - detailRect.left;
+  const top = ttoriRect.top - detailRect.top;
+  const contractSize = clampNumber(detailRect.width * 0.085, 58, 116);
+  const startX = clampNumber(left + ttoriRect.width * 0.08 - contractSize * 0.5, 12, detailRect.width - contractSize - 12);
+  const startY = clampNumber(top + ttoriRect.height * 0.52 - contractSize * 0.48, 12, detailRect.height - contractSize - 12);
+  const endX = clampNumber(startX + detailRect.width * 0.08, 18, detailRect.width - contractSize - 18);
+  const endY = Math.max(startY + 44, detailRect.height - contractSize - clampNumber(detailRect.height * 0.055, 20, 54));
+
+  clearTimeout(stage._ttoriStartTimer);
+  detail.classList.remove('is-ttori-ready', 'is-ttori-intro');
+  ttori.style.animation = 'none';
+  ttori.style.left = `${left}px`;
+  ttori.style.top = `${top}px`;
+  ttori.style.width = `${ttoriRect.width}px`;
+  ttori.style.transform = 'none';
+  ttori.classList.add('is-paused');
+  ttori.disabled = true;
+
+  contract.style.width = `${contractSize}px`;
+  contract.style.setProperty('--contract-start-x', `${startX}px`);
+  contract.style.setProperty('--contract-start-y', `${startY}px`);
+  contract.style.setProperty('--contract-end-x', `${endX}px`);
+  contract.style.setProperty('--contract-end-y', `${endY}px`);
+  contract.classList.remove('is-dropping');
+  contract.getBoundingClientRect();
+  detail.classList.add('is-contract-dropping');
+  contract.classList.add('is-dropping');
+  contract.disabled = true;
+
+  clearTimeout(stage._ttoriSitTimer);
+  clearTimeout(stage._ttoriContractReadyTimer);
+  stage._ttoriContractReadyTimer = setTimeout(() => {
+    contract.disabled = false;
+    detail.classList.add('is-contract-ready');
+  }, 1360);
+  stage._ttoriSitTimer = setTimeout(() => {
+    ttoriImg.src = ttoriImg.dataset.sitSrc;
+    ttori.classList.add('is-sitting');
+    detail.classList.add('is-ttori-settled');
+  }, 1720);
+}
+
+function openYoungsunTtoriPdf(stage) {
+  const detail = stage.querySelector('[data-youngsun-detail="ttori"]');
+  const contract = detail?.querySelector('[data-ttori-contract]');
+  const pdfPanel = detail?.querySelector('[data-ttori-pdf-panel]');
+  if (!detail || !contract || !pdfPanel) return;
+  if (!detail.classList.contains('is-contract-ready')) return;
+
+  contract.disabled = true;
+  detail.classList.add('is-pdf-open');
+  pdfPanel.setAttribute('aria-hidden', 'false');
+}
+
+function closeYoungsunTtoriPdf(stage) {
+  startYoungsunTtoriIntro(stage);
+}
+
+function clampNumber(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function setYoungsunWorkHeader(stage, workId) {
+  const work = YOUNGSUN_WORK_META[workId];
+  const page = document.getElementById('page-artist');
+  const headerName = document.getElementById('header-artist-name');
+  const artistMeta = document.getElementById('artist-meta');
+  const backButton = document.querySelector('.back-btn');
+  if (!work || !page || !headerName || !artistMeta || !backButton) return;
+
+  page.classList.add('youngsun-work-header');
+  headerName.textContent = work.caption;
+  artistMeta.textContent = '';
+  backButton.innerHTML = '<span class="back-arr">←</span><span>Works</span>';
+  backButton.onclick = event => {
+    event.preventDefault();
+    closeYoungsunWork(stage);
+  };
+}
+
+function restoreYoungsunArtistHeader() {
+  const page = document.getElementById('page-artist');
+  const headerName = document.getElementById('header-artist-name');
+  const artistMeta = document.getElementById('artist-meta');
+  const backButton = document.querySelector('.back-btn');
+  if (!page || !headerName || !artistMeta || !backButton) return;
+
+  page.classList.remove('youngsun-work-header');
+  headerName.textContent = '유영선';
+  artistMeta.textContent = 'Multimedia · 3 works';
+  backButton.innerHTML = '<span class="back-arr">←</span><span>Back</span>';
+  backButton.onclick = event => {
+    event.preventDefault();
+    closeArtist();
+  };
 }
 
 function applyYoungsunSavedLayout() {
@@ -340,6 +717,10 @@ function initYoungsunFlies() {
       // 작품 영역은 page-artist 내부 좌표로 보관해서 스크롤 때 흔들리지 않게 한다.
       const items = document.querySelectorAll('.w-item');
       const pageEl = document.getElementById('page-artist');
+      if (!items.length) {
+        canvas.style.display = 'none';
+        return;
+      }
 
       function getItemRect(el) {
         const r = el.getBoundingClientRect();

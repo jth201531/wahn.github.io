@@ -19,12 +19,16 @@ const cursor = document.getElementById('cursor');
         else cursor.classList.add('hover');
         return;
       }
-      if (e.target.closest('.tile, .back-btn, a.logo, .artist-transition-gate, .archive-toggle, .archive-close, .archive-list-item')) cursor.classList.add('hover');
+      if (e.target.closest('.tile, .youngsun-object, .youngsun-transition-gate, .youngsun-ttori-wanderer, .youngsun-contract-drop, .youngsun-pdf-close, .youngsun-work-back, .back-btn, a.logo, .artist-transition-gate, .archive-toggle, .archive-close, .archive-list-item')) cursor.classList.add('hover');
       else cursor.classList.remove('hover');
     });
 
     // 유영선 이미지 preload
-    ['youngsun/player.jpeg', 'youngsun/stone.jpeg', 'youngsun/makeup.jpeg',
+    ['youngsun/또리는 강쥐/또리.png',
+     'youngsun/또리는 강쥐/ttori-front-cropped.webp',
+     'youngsun/또리는 강쥐/또리 전경-white-wall-no-ttori-screen.png',
+     'youngsun/또리는 강쥐/앉은 또리.png',
+     'youngsun/또리는 강쥐/계약서.png',
      'minseo/work1.png', 'minseo/work2.png', 'minseo/work3.png', 'minseo/work4.png', 'minseo/work5.png'
     ].forEach(src => {
       const img = new Image();
@@ -470,22 +474,38 @@ const cursor = document.getElementById('cursor');
 
     function openArtist(i) {
       const a = artists[i];
+      const pageArtist = document.getElementById('page-artist');
+      resetArtistHeaderControls();
       document.getElementById('header-artist-name').textContent = a.name;
       document.getElementById('artist-meta').textContent = `${a.genre} · ${a.works}`;
       document.getElementById('artist-works').innerHTML = a.html;
-      document.getElementById('page-artist').classList.add('visible');
-      document.getElementById('page-artist').scrollTop = 0;
+      pageArtist.dataset.display = a.display || '';
+      pageArtist.classList.add('visible');
+      pageArtist.scrollTop = 0;
       if (a.display === 'b') {
-        document.getElementById('page-artist').style.background = '#000';
-        document.getElementById('page-artist').style.color = '#fff';
+        pageArtist.style.background = '#000';
+        pageArtist.style.color = '#fff';
         document.getElementById('header-artist-name').style.color = '#fff';
         document.getElementById('artist-meta').style.color = 'rgba(255,255,255,0.5)';
         document.querySelector('.back-btn').style.color = 'rgba(255,255,255,0.5)';
         document.querySelector('.artist-page-header').style.borderColor = 'rgba(255,255,255,0.1)';
       }
-      if (a.display !== 'b') document.getElementById('page-artist').style.background = 'var(--bg)';
+      if (a.display !== 'b') pageArtist.style.background = 'var(--bg)';
       if (typeof a.init === 'function') a.init();
     }
+
+function resetArtistHeaderControls() {
+  const pageArtist = document.getElementById('page-artist');
+  const backButton = document.querySelector('.back-btn');
+  if (pageArtist) pageArtist.classList.remove('youngsun-work-header');
+  if (backButton) {
+    backButton.innerHTML = '<span class="back-arr">←</span><span>Back</span>';
+    backButton.onclick = event => {
+      event.preventDefault();
+      closeArtist();
+    };
+  }
+}
 
 function closeArtist() {
   if (window._soeunCanvas) { window._soeunCanvas._remove(); window._soeunCanvas = null; }
@@ -499,12 +519,14 @@ function closeArtist() {
   resetStagePan({ animateTiles: false });
   cursor.classList.remove('hover');
   document.getElementById('page-artist').classList.remove('from-pan');
+  resetArtistHeaderControls();
   document.getElementById('page-artist').style.background = 'var(--bg)';
   document.getElementById('page-artist').style.color = '';
   document.getElementById('header-artist-name').style.color = '';
   document.getElementById('artist-meta').style.color = '';
   document.querySelector('.back-btn').style.color = '';
   document.querySelector('.artist-page-header').style.borderColor = '';
+  document.getElementById('page-artist').removeAttribute('data-display');
   document.getElementById('page-artist').classList.remove('visible');
   document.getElementById('artist-works').innerHTML = '';
 }

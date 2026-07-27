@@ -2543,3 +2543,626 @@ body.dragging-main .record-disc,
     inset 0 0 26px rgba(255, 255, 255, 0.045),
     inset 0 0 56px rgba(0, 0, 0, 0.62) !important;
 }
+
+
+/* Empty Youngsun main surface */
+.display-c.youngsun-main-page {
+  min-height: calc(100vh - 92px);
+  padding: 0;
+}
+
+
+/* Fit Youngsun main page to viewport */
+#page-artist[data-display="c"] {
+  overflow: hidden;
+}
+
+#page-artist[data-display="c"] .artist-page-wrap {
+  height: 100vh;
+  min-height: 0;
+  box-sizing: border-box;
+}
+
+#page-artist[data-display="c"] .artist-page-works {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+#page-artist[data-display="c"] .display-c.youngsun-main-page {
+  flex: 1 1 auto;
+  height: 100%;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+
+/* Youngsun object archive */
+.youngsun-main-page {
+  position: relative;
+}
+
+.youngsun-object-field {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.42s ease, transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.youngsun-object {
+  position: absolute;
+  left: clamp(104px, 16vw, 220px);
+  top: clamp(112px, 21vh, 178px);
+  width: clamp(230px, 24vw, 330px);
+  aspect-ratio: 4 / 3;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  color: #171717;
+  transform: rotate(-5deg);
+  transform-origin: center;
+  transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
+}
+
+.youngsun-object:hover,
+.youngsun-object.is-filling,
+.youngsun-object.is-filled {
+  transform: translate3d(0, -4px, 0) rotate(-5deg) scale(1.025);
+}
+
+.youngsun-object-img,
+.youngsun-object-fill {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.youngsun-object-img {
+  display: block;
+  object-fit: contain;
+  opacity: 0.28;
+  filter: grayscale(1);
+  pointer-events: none;
+  user-select: none;
+}
+
+.youngsun-object-fill {
+  background: #147bb7;
+  opacity: 0.94;
+  clip-path: inset(100% 0 0 0);
+  -webkit-mask: url("youngsun/또리는 강쥐/또리.png") center / contain no-repeat;
+  mask: url("youngsun/또리는 강쥐/또리.png") center / contain no-repeat;
+  transition: clip-path 1.05s cubic-bezier(0.76, 0, 0.24, 1);
+  pointer-events: none;
+}
+
+.youngsun-object.is-filling .youngsun-object-fill,
+.youngsun-object.is-filled .youngsun-object-fill {
+  clip-path: inset(0 0 0 0);
+}
+
+.youngsun-object-name {
+  position: absolute;
+  left: 8%;
+  top: calc(100% + 12px);
+  font-family: 'Bodoni Moda', serif;
+  font-size: clamp(15px, 1.25vw, 20px);
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: rgba(23, 23, 23, 0.72);
+  white-space: nowrap;
+  transition: color 0.22s ease, transform 0.3s ease;
+}
+
+.youngsun-object.is-filled .youngsun-object-name {
+  color: rgba(20, 123, 183, 0.92);
+  transform: translateY(3px);
+}
+
+.youngsun-main-page.is-work-open .youngsun-object-field {
+  opacity: 0;
+  transform: scale(0.98);
+  pointer-events: none;
+}
+
+.youngsun-main-page.is-work-transitioning .youngsun-object-field {
+  opacity: 0.08;
+  transform: scale(0.985);
+  pointer-events: none;
+}
+
+.youngsun-work-transition {
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+  overflow: hidden;
+  pointer-events: auto;
+  opacity: 1;
+  background: rgba(247, 245, 242, 0.84);
+  transition: opacity 0.42s ease, transform 0.58s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.youngsun-work-transition::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.16), transparent 18%, transparent 78%, rgba(0, 0, 0, 0.18)),
+    radial-gradient(circle at 50% 50%, transparent 42%, rgba(0, 0, 0, 0.18) 100%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.8s ease;
+}
+
+.youngsun-work-transition.is-active::after {
+  opacity: 1;
+}
+
+.youngsun-work-transition-image {
+  position: absolute;
+  left: var(--transition-start-left, 0);
+  top: var(--transition-start-top, 0);
+  width: var(--transition-start-width, 240px);
+  height: var(--transition-start-height, 180px);
+  aspect-ratio: 173 / 225;
+  z-index: 0;
+  overflow: hidden;
+  border-radius: 6px;
+  opacity: 0;
+  transform: scale(0.94) rotate(-5deg);
+  transform-origin: center;
+  box-shadow: 0 18px 54px rgba(20, 20, 20, 0.16);
+  transition:
+    left 0.95s cubic-bezier(0.76, 0, 0.24, 1),
+    top 0.95s cubic-bezier(0.76, 0, 0.24, 1),
+    width 0.95s cubic-bezier(0.76, 0, 0.24, 1),
+    height 0.95s cubic-bezier(0.76, 0, 0.24, 1),
+    border-radius 0.95s cubic-bezier(0.76, 0, 0.24, 1),
+    opacity 0.34s ease,
+    transform 0.95s cubic-bezier(0.76, 0, 0.24, 1);
+  will-change: left, top, width, height, opacity, transform;
+}
+
+.youngsun-work-transition-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  background: rgba(247, 245, 242, 0.86);
+  transform: scale(1.12);
+  transition: transform 1.05s cubic-bezier(0.76, 0, 0.24, 1);
+  pointer-events: none;
+  user-select: none;
+}
+
+.youngsun-work-transition.is-active .youngsun-work-transition-image {
+  left: 50%;
+  top: 50%;
+  width: min(72vw, 58.45vh);
+  height: min(76vh, 93.65vw);
+  border-radius: 4px;
+  opacity: 1;
+  transform: translate3d(-50%, -50%, 0) scale(1) rotate(0deg);
+}
+
+.youngsun-work-transition.is-active .youngsun-work-transition-image img {
+  transform: scale(1);
+}
+
+.youngsun-work-transition.is-exit {
+  opacity: 0;
+  transform: scale(1.018);
+  pointer-events: none;
+}
+
+.youngsun-work-transition.is-canceling {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.youngsun-work-transition.is-canceling .youngsun-work-transition-image {
+  left: var(--transition-start-left, 0);
+  top: var(--transition-start-top, 0);
+  width: var(--transition-start-width, 240px);
+  height: var(--transition-start-height, 180px);
+  border-radius: 6px;
+  transform: scale(0.92) rotate(-5deg);
+}
+
+.youngsun-transition-gate {
+  position: absolute;
+  left: 50%;
+  top: min(calc(50% + min(38vh, 46.83vw) - 60px), calc(100% - 66px));
+  z-index: 3;
+  width: 48px;
+  height: 48px;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  border-radius: 50%;
+  background: rgba(18, 18, 18, 0.2);
+  cursor: none;
+  opacity: 0;
+  pointer-events: auto;
+  transform: translate3d(-50%, 12px, 0) scale(0.94);
+  transition: opacity 0.34s ease, transform 0.34s cubic-bezier(0.76, 0, 0.24, 1), background 0.2s ease;
+}
+
+.youngsun-transition-gate.visible {
+  opacity: 1;
+  transform: translate3d(-50%, 0, 0) scale(1);
+}
+
+.youngsun-transition-gate.exit {
+  opacity: 0;
+  transform: translate3d(-50%, -6px, 0) scale(0.96);
+}
+
+.youngsun-transition-gate:hover {
+  background: rgba(18, 18, 18, 0.3);
+}
+
+.youngsun-transition-gate svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  transform: rotate(-90deg);
+}
+
+.youngsun-transition-gate .gate-base {
+  stroke: rgba(255, 255, 255, 0.38);
+}
+
+.youngsun-transition-gate .gate-progress,
+.youngsun-transition-gate .gate-x-line {
+  stroke: #fff;
+}
+
+.youngsun-transition-gate.filling .gate-progress {
+  animation: gate-fill 1.6s linear forwards;
+}
+
+.youngsun-work-detail {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(18px);
+  transition: opacity 0.42s ease, transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.youngsun-work-detail.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.youngsun-work-back {
+  position: absolute;
+  left: 0;
+  top: 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: rgba(23, 23, 23, 0.58);
+  font: inherit;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.youngsun-work-detail-title {
+  font-family: 'Bodoni Moda', serif;
+  font-size: clamp(36px, 5vw, 72px);
+  line-height: 1;
+  color: #171717;
+}
+
+#page-artist.youngsun-work-header #header-artist-name {
+  font-family: inherit !important;
+  font-size: clamp(13px, 1.35vw, 17px) !important;
+  line-height: 1.4 !important;
+  letter-spacing: 0.02em !important;
+  color: var(--fg) !important;
+  white-space: normal;
+}
+
+#page-artist.youngsun-work-header #artist-meta {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .youngsun-object {
+    left: 50%;
+    top: 18vh;
+    width: min(70vw, 280px);
+    transform: translateX(-50%) rotate(-5deg);
+  }
+
+  .youngsun-object:hover,
+  .youngsun-object.is-filling,
+  .youngsun-object.is-filled {
+    transform: translateX(-50%) translate3d(0, -4px, 0) rotate(-5deg) scale(1.02);
+  }
+}
+
+
+/* Youngsun object fill without CSS mask for file previews */
+.youngsun-object-fill {
+  overflow: hidden;
+  background: transparent !important;
+  -webkit-mask: none !important;
+  mask: none !important;
+}
+
+.youngsun-object-fill img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: invert(35%) sepia(82%) saturate(909%) hue-rotate(166deg) brightness(88%) contrast(94%);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Ttori work page background */
+.youngsun-work-detail[data-youngsun-detail="ttori"] {
+  background: #f7f5f2;
+  overflow: hidden;
+}
+
+.youngsun-work-detail[data-youngsun-detail="ttori"]::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 clamp(34px, 5.5vh, 72px);
+  background: url("youngsun/또리는 강쥐/또리 전경-white-wall-no-ttori-screen.png") center top / contain no-repeat;
+  pointer-events: none;
+  z-index: 0;
+  transform-origin: 42% 52%;
+  transition: transform 0.9s cubic-bezier(0.76, 0, 0.24, 1), opacity 0.9s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.youngsun-work-detail[data-youngsun-detail="ttori"].is-pdf-open::before {
+  opacity: 0.18;
+  transform: translate3d(-30vw, 0, 0) scale(0.96);
+}
+
+.youngsun-work-detail[data-youngsun-detail="ttori"] .youngsun-work-detail-title {
+  display: none;
+}
+
+.youngsun-ttori-wanderer {
+  position: absolute;
+  left: 34.8%;
+  top: 45.6%;
+  z-index: 1;
+  width: clamp(72px, 9vw, 150px);
+  height: auto;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  opacity: 0.9;
+  pointer-events: auto;
+  cursor: none;
+  user-select: none;
+  filter: drop-shadow(0 10px 16px rgba(20, 20, 20, 0.08));
+  transform-origin: center;
+  will-change: left, top, transform;
+  transform: rotate(-6deg) scale(0.94);
+  animation: none;
+}
+
+.youngsun-work-detail[data-youngsun-detail="ttori"].is-ttori-ready .youngsun-ttori-wanderer:not(.is-paused) {
+  animation: ttori-wander 20s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+}
+
+.youngsun-ttori-wanderer:disabled {
+  pointer-events: none;
+}
+
+.youngsun-ttori-wanderer-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+}
+
+.youngsun-ttori-wanderer.is-paused {
+  animation: none;
+}
+
+.youngsun-ttori-wanderer.is-sitting {
+  opacity: 0.96;
+  filter: drop-shadow(0 12px 18px rgba(20, 20, 20, 0.1));
+}
+
+.youngsun-work-detail[data-youngsun-detail="ttori"].is-pdf-open .youngsun-ttori-wanderer {
+  opacity: 0.28;
+  transform: translate3d(-26vw, 0, 0) scale(0.86) !important;
+  transition: opacity 0.75s ease, transform 0.9s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.youngsun-contract-drop {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1;
+  width: clamp(58px, 8.5vw, 116px);
+  height: auto;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  opacity: 0;
+  pointer-events: none;
+  cursor: none;
+  user-select: none;
+  transform-origin: 50% 20%;
+  transform: translate3d(var(--contract-start-x, -80px), var(--contract-start-y, -80px), 0) scale(0.18) rotate(-18deg);
+  filter: drop-shadow(0 12px 14px rgba(20, 20, 20, 0.12));
+  will-change: transform, opacity;
+}
+
+.youngsun-contract-drop:disabled {
+  pointer-events: none;
+}
+
+.youngsun-contract-drop img {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+}
+
+.youngsun-contract-drop.is-dropping {
+  animation: ttori-contract-drop 1.32s cubic-bezier(0.24, 0.82, 0.32, 1) forwards;
+}
+
+.youngsun-work-detail[data-youngsun-detail="ttori"].is-contract-ready .youngsun-contract-drop.is-dropping:not(:disabled) {
+  pointer-events: auto;
+}
+
+.youngsun-work-detail[data-youngsun-detail="ttori"].is-pdf-open .youngsun-contract-drop {
+  animation: none;
+  opacity: 0.22;
+  pointer-events: none;
+  transform: translate3d(calc(var(--contract-end-x) - 28vw), var(--contract-end-y), 0) scale(0.74) rotate(8deg);
+  transition: opacity 0.65s ease, transform 0.9s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.youngsun-pdf-panel {
+  position: absolute;
+  inset: clamp(18px, 3vh, 34px) clamp(16px, 4vw, 58px) clamp(22px, 4vh, 54px) clamp(16px, 4vw, 58px);
+  z-index: 3;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(38vw, 0, 0) scale(0.96);
+  transform-origin: center;
+  transition: opacity 0.72s ease 0.18s, transform 0.9s cubic-bezier(0.76, 0, 0.24, 1) 0.1s;
+}
+
+.youngsun-work-detail[data-youngsun-detail="ttori"].is-pdf-open .youngsun-pdf-panel {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+.youngsun-pdf-frame {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.youngsun-pdf-close {
+  position: absolute;
+  right: clamp(12px, 1.35vw, 20px);
+  top: 8px;
+  z-index: 4;
+  width: 38px;
+  aspect-ratio: 1;
+  border: 1px solid rgba(23, 23, 23, 0.16);
+  border-radius: 50%;
+  padding: 0;
+  background: rgba(247, 245, 242, 0.92);
+  color: rgba(23, 23, 23, 0.78);
+  font-size: 28px;
+  line-height: 1;
+  cursor: none;
+  display: grid;
+  place-items: center;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.youngsun-pdf-close:hover {
+  color: #171717;
+  border-color: rgba(23, 23, 23, 0.34);
+  background: rgba(255, 255, 255, 0.96);
+  transform: scale(1.04);
+}
+
+@keyframes ttori-wander {
+  0% {
+    left: 34.8%;
+    top: 45.6%;
+    transform: rotate(-6deg) scale(0.94);
+  }
+
+  17% {
+    left: 24%;
+    top: 35%;
+    transform: rotate(5deg) scale(1.02);
+  }
+
+  36% {
+    left: 56%;
+    top: 48%;
+    transform: rotate(-3deg) scale(0.96);
+  }
+
+  55% {
+    left: 74%;
+    top: 24%;
+    transform: rotate(8deg) scale(1.04);
+  }
+
+  76% {
+    left: 42%;
+    top: 68%;
+    transform: rotate(-9deg) scale(0.98);
+  }
+
+  100% {
+    left: 34.8%;
+    top: 45.6%;
+    transform: rotate(-6deg) scale(0.94);
+  }
+}
+
+@keyframes ttori-contract-drop {
+  0% {
+    opacity: 0;
+    transform: translate3d(var(--contract-start-x), var(--contract-start-y), 0) scale(0.18) rotate(-18deg);
+  }
+
+  12% {
+    opacity: 1;
+    transform: translate3d(var(--contract-start-x), var(--contract-start-y), 0) scale(0.62) rotate(-8deg);
+  }
+
+  74% {
+    opacity: 1;
+    transform: translate3d(var(--contract-end-x), var(--contract-end-y), 0) scale(1) rotate(12deg);
+  }
+
+  88% {
+    opacity: 1;
+    transform: translate3d(var(--contract-end-x), calc(var(--contract-end-y) - 12px), 0) scale(1) rotate(6deg);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate3d(var(--contract-end-x), var(--contract-end-y), 0) scale(1) rotate(8deg);
+  }
+}
+
+@media (max-width: 760px) {
+  .youngsun-work-detail[data-youngsun-detail="ttori"]::before {
+    bottom: 44px;
+  }
+
+  .youngsun-ttori-wanderer {
+    width: clamp(64px, 18vw, 112px);
+  }
+}
