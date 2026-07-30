@@ -29,6 +29,11 @@ const cursor = document.getElementById('cursor');
      'youngsun/ttori_the_dog/ttori_wall.png',
      'youngsun/ttori_the_dog/ttori_sit.png',
      'youngsun/ttori_the_dog/contract.png',
+     'youngsun/makeup_following/makeup_thumb.png',
+     'youngsun/makeup_following/makeup_photo.jpg',
+     'youngsun/makeup_following/makeup_01_keyed.png',
+     'youngsun/makeup_following/makeup_01.png',
+     'youngsun/makeup_following/makeup_02.png',
      'minseo/work1.png', 'minseo/work2.png', 'minseo/work3.png', 'minseo/work4.png', 'minseo/work5.png'
     ].forEach(src => {
       const img = new Image();
@@ -511,6 +516,7 @@ function closeArtist() {
   if (window._soeunCanvas) { window._soeunCanvas._remove(); window._soeunCanvas = null; }
   if (window._fliesAbort) { window._fliesAbort.abort(); window._fliesAbort = null; }
   if (window._youngsunEditorAbort) { window._youngsunEditorAbort.abort(); window._youngsunEditorAbort = null; }
+  if (typeof window.stopYoungsunMakeupCamera === 'function') window.stopYoungsunMakeupCamera();
   const fc = document.getElementById('fly-canvas');
   if (fc && fc._stop) { fc._stop(); fc._stop = null; }
   if (fc) { fc.style.display = 'none'; fc.width = 1; }

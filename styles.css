@@ -2612,6 +2612,20 @@ body.dragging-main .record-disc,
   transform: translate3d(0, -4px, 0) rotate(-5deg) scale(1.025);
 }
 
+.youngsun-object-makeup {
+  left: clamp(420px, 52vw, 720px);
+  top: clamp(172px, 32vh, 286px);
+  width: clamp(156px, 17vw, 238px);
+  aspect-ratio: 1763 / 1992;
+  transform: rotate(4deg);
+}
+
+.youngsun-object-makeup:hover,
+.youngsun-object-makeup.is-filling,
+.youngsun-object-makeup.is-filled {
+  transform: translate3d(0, -4px, 0) rotate(4deg) scale(1.025);
+}
+
 .youngsun-object-img,
 .youngsun-object-fill {
   position: absolute;
@@ -2708,7 +2722,7 @@ body.dragging-main .record-disc,
   top: var(--transition-start-top, 0);
   width: var(--transition-start-width, 240px);
   height: var(--transition-start-height, 180px);
-  aspect-ratio: 173 / 225;
+  aspect-ratio: var(--transition-ratio, 0.7689);
   z-index: 0;
   overflow: hidden;
   border-radius: 6px;
@@ -2743,8 +2757,8 @@ body.dragging-main .record-disc,
 .youngsun-work-transition.is-active .youngsun-work-transition-image {
   left: 50%;
   top: 50%;
-  width: min(72vw, 58.45vh);
-  height: min(76vh, 93.65vw);
+  width: var(--transition-final-width, min(72vw, 58.45vh));
+  height: var(--transition-final-height, min(76vh, 93.65vw));
   border-radius: 4px;
   opacity: 1;
   transform: translate3d(-50%, -50%, 0) scale(1) rotate(0deg);
@@ -2777,7 +2791,7 @@ body.dragging-main .record-disc,
 .youngsun-transition-gate {
   position: absolute;
   left: 50%;
-  top: min(calc(50% + min(38vh, 46.83vw) - 60px), calc(100% - 66px));
+  top: min(calc(50% + var(--transition-gate-offset, min(38vh, 46.83vw)) - 60px), calc(100% - 66px));
   z-index: 3;
   width: 48px;
   height: 48px;
@@ -2892,6 +2906,18 @@ body.dragging-main .record-disc,
   .youngsun-object.is-filled {
     transform: translateX(-50%) translate3d(0, -4px, 0) rotate(-5deg) scale(1.02);
   }
+
+  .youngsun-object-makeup {
+    top: 47vh;
+    width: min(58vw, 220px);
+    transform: translateX(-50%) rotate(4deg);
+  }
+
+  .youngsun-object-makeup:hover,
+  .youngsun-object-makeup.is-filling,
+  .youngsun-object-makeup.is-filled {
+    transform: translateX(-50%) translate3d(0, -4px, 0) rotate(4deg) scale(1.02);
+  }
 }
 
 
@@ -2911,6 +2937,66 @@ body.dragging-main .record-disc,
   filter: invert(35%) sepia(82%) saturate(909%) hue-rotate(166deg) brightness(88%) contrast(94%);
   pointer-events: none;
   user-select: none;
+}
+
+/* Youngsun makeup following page */
+.youngsun-work-detail[data-youngsun-detail="makeup"] {
+  background: #f7f5f2;
+  overflow: hidden;
+}
+
+.youngsun-work-detail[data-youngsun-detail="makeup"] .youngsun-work-detail-title {
+  display: none;
+}
+
+.youngsun-makeup-page {
+  position: relative;
+  width: min(76vh, 74vw, 760px);
+  aspect-ratio: 647 / 638;
+}
+
+.youngsun-makeup-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.youngsun-makeup-base {
+  display: block;
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  user-select: none;
+  pointer-events: none;
+}
+
+.youngsun-makeup-camera {
+  position: absolute;
+  left: 34.08%;
+  top: 9.7%;
+  width: 42.2%;
+  height: 54.42%;
+  z-index: 1;
+  overflow: hidden;
+  border-radius: 50%;
+  background: transparent;
+}
+
+.youngsun-makeup-video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transform: scaleX(-1);
+  filter: saturate(1) contrast(1);
+  transition: opacity 0.38s ease;
+}
+
+.youngsun-work-detail[data-youngsun-detail="makeup"].is-camera-live .youngsun-makeup-video {
+  opacity: 1;
 }
 
 /* Ttori work page background */
@@ -3158,6 +3244,10 @@ body.dragging-main .record-disc,
 }
 
 @media (max-width: 760px) {
+  .youngsun-makeup-page {
+    width: min(88vw, 520px, 72vh);
+  }
+
   .youngsun-work-detail[data-youngsun-detail="ttori"]::before {
     bottom: 44px;
   }

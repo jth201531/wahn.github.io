@@ -8,6 +8,10 @@ window.artists.push({
       <span class="youngsun-object-fill" aria-hidden="true"><img src="youngsun/ttori_the_dog/ttori.png" alt=""></span>
       <img class="youngsun-object-img" src="youngsun/ttori_the_dog/ttori.png" alt="">
     </button>
+    <button class="youngsun-object youngsun-object-makeup" type="button" data-youngsun-work="makeup" aria-label="화장 따라하기">
+      <span class="youngsun-object-fill" aria-hidden="true"><img src="youngsun/makeup_following/makeup_thumb.png" alt=""></span>
+      <img class="youngsun-object-img" src="youngsun/makeup_following/makeup_thumb.png" alt="">
+    </button>
   </div>
   <section class="youngsun-work-detail" data-youngsun-detail="ttori" aria-hidden="true">
     <button class="youngsun-ttori-wanderer" type="button" data-ttori-wanderer aria-label="또리 계약서 떨어뜨리기">
@@ -22,6 +26,17 @@ window.artists.push({
     </div>
     <div class="youngsun-work-detail-title">또리는 강쥐</div>
   </section>
+  <section class="youngsun-work-detail youngsun-makeup-detail" data-youngsun-detail="makeup" aria-hidden="true">
+    <div class="youngsun-makeup-page">
+      <div class="youngsun-makeup-stage" aria-hidden="true">
+        <img class="youngsun-makeup-base" src="youngsun/makeup_following/makeup_01_keyed.png" alt="">
+        <div class="youngsun-makeup-camera">
+          <video class="youngsun-makeup-video" data-makeup-video autoplay muted playsinline></video>
+        </div>
+      </div>
+    </div>
+    <div class="youngsun-work-detail-title">화장 따라하기</div>
+  </section>
 </div>`,
         init: initYoungsun
       });
@@ -30,10 +45,23 @@ const YOUNGSUN_WORK_META = {
   ttori: {
     caption: '<또리는 강쥐>, 2022, 벽면에 흑연, 가변설치',
   },
+  makeup: {
+    caption: '<화장 따라하기>, 2025, 훌라후프와 PVC 비닐에 영상 프로젝션, 6\'20"',
+  },
 };
 
-const YOUNGSUN_TTORI_TRANSITION_IMAGE = 'youngsun/ttori_the_dog/ttori_the_dog.webp';
-const YOUNGSUN_TTORI_TRANSITION_RATIO = 173 / 225;
+const YOUNGSUN_WORK_TRANSITIONS = {
+  ttori: {
+    image: 'youngsun/ttori_the_dog/ttori_the_dog.webp',
+    ratio: 173 / 225,
+    cancelLabel: '또리는 강쥐 진입 취소',
+  },
+  makeup: {
+    image: 'youngsun/makeup_following/makeup_photo.jpg',
+    ratio: 3 / 2,
+    cancelLabel: '화장 따라하기 진입 취소',
+  },
+};
 const YOUNGSUN_LAYOUT_KEY = 'wahn-youngsun-layout-v1';
 const YOUNGSUN_CAPTION_KEY = 'wahn-youngsun-captions-v1';
 const YOUNGSUN_WORK_CLASSES = ['youngsun-work-player', 'youngsun-work-stone', 'youngsun-work-makeup'];
@@ -41,6 +69,7 @@ const YOUNGSUN_WORK_CLASSES = ['youngsun-work-player', 'youngsun-work-stone', 'y
 function initYoungsun() {
   if (window._fliesAbort) { window._fliesAbort.abort(); window._fliesAbort = null; }
   if (window._youngsunEditorAbort) { window._youngsunEditorAbort.abort(); window._youngsunEditorAbort = null; }
+  stopYoungsunMakeupCamera();
   document.body.classList.remove('youngsun-editing');
   const flyCanvas = document.getElementById('fly-canvas');
   if (flyCanvas) {
@@ -102,23 +131,33 @@ function startYoungsunWorkTransition(stage, object, workId) {
 
   clearYoungsunWorkTransition(stage, { resetObjects: false, immediate: true });
 
+  const transition = YOUNGSUN_WORK_TRANSITIONS[workId] || YOUNGSUN_WORK_TRANSITIONS.ttori;
+  const ratio = transition.ratio || 1;
   const stageRect = stage.getBoundingClientRect();
   const objectRect = object.getBoundingClientRect();
-  const startHeight = objectRect.height;
-  const startWidth = startHeight * YOUNGSUN_TTORI_TRANSITION_RATIO;
+  let startWidth = objectRect.width;
+  let startHeight = startWidth / ratio;
+  if (startHeight > objectRect.height) {
+    startHeight = objectRect.height;
+    startWidth = startHeight * ratio;
+  }
   const startLeft = objectRect.left - stageRect.left + objectRect.width / 2 - startWidth / 2;
   const startTop = objectRect.top - stageRect.top + objectRect.height / 2 - startHeight / 2;
   const overlay = document.createElement('div');
   overlay.className = 'youngsun-work-transition';
+  overlay.style.setProperty('--transition-ratio', `${ratio}`);
   overlay.style.setProperty('--transition-start-left', `${startLeft}px`);
   overlay.style.setProperty('--transition-start-top', `${startTop}px`);
   overlay.style.setProperty('--transition-start-width', `${startWidth}px`);
   overlay.style.setProperty('--transition-start-height', `${startHeight}px`);
+  overlay.style.setProperty('--transition-final-width', `min(72vw, ${(76 * ratio).toFixed(2)}vh)`);
+  overlay.style.setProperty('--transition-final-height', `min(76vh, ${(72 / ratio).toFixed(2)}vw)`);
+  overlay.style.setProperty('--transition-gate-offset', `min(38vh, ${(36 / ratio).toFixed(2)}vw)`);
   overlay.innerHTML = `
     <div class="youngsun-work-transition-image" aria-hidden="true">
-      <img src="${YOUNGSUN_TTORI_TRANSITION_IMAGE}" alt="">
+      <img src="${transition.image}" alt="">
     </div>
-    <button class="youngsun-transition-gate" type="button" aria-label="또리는 강쥐 진입 취소">
+    <button class="youngsun-transition-gate" type="button" aria-label="${transition.cancelLabel || '작품 진입 취소'}">
       <svg viewBox="0 0 48 48" aria-hidden="true">
         <circle class="gate-base" cx="24" cy="24" r="19.5"></circle>
         <circle class="gate-progress" cx="24" cy="24" r="19.5"></circle>
@@ -227,6 +266,9 @@ function openYoungsunWork(stage, workId) {
   });
   setYoungsunWorkHeader(stage, workId);
   if (workId === 'ttori') startYoungsunTtoriIntro(stage);
+  else resetYoungsunTtori(stage);
+  if (workId === 'makeup') startYoungsunMakeupCamera(stage);
+  else stopYoungsunMakeupCamera(stage);
 }
 
 function closeYoungsunWork(stage) {
@@ -241,8 +283,59 @@ function closeYoungsunWork(stage) {
     object.setAttribute('aria-pressed', 'false');
   });
   resetYoungsunTtori(stage);
+  stopYoungsunMakeupCamera(stage);
   restoreYoungsunArtistHeader();
 }
+
+function startYoungsunMakeupCamera(stage) {
+  const detail = stage?.querySelector('[data-youngsun-detail="makeup"]');
+  const video = detail?.querySelector('[data-makeup-video]');
+  if (!detail || !video) return;
+
+  stopYoungsunMakeupCamera(stage);
+  detail.classList.remove('is-camera-live', 'is-camera-unavailable');
+
+  if (!navigator.mediaDevices?.getUserMedia) {
+    detail.classList.add('is-camera-unavailable');
+    return;
+  }
+
+  navigator.mediaDevices.getUserMedia({
+    video: {
+      facingMode: 'user',
+      width: { ideal: 1280 },
+      height: { ideal: 960 },
+    },
+    audio: false,
+  }).then(stream => {
+    if (!detail.classList.contains('is-visible')) {
+      stream.getTracks().forEach(track => track.stop());
+      return;
+    }
+    stage._youngsunMakeupStream = stream;
+    window._youngsunMakeupCameraStream = stream;
+    video.srcObject = stream;
+    detail.classList.add('is-camera-live');
+    video.play().catch(() => {});
+  }).catch(() => {
+    detail.classList.add('is-camera-unavailable');
+  });
+}
+
+function stopYoungsunMakeupCamera(stage) {
+  const stream = stage?._youngsunMakeupStream || window._youngsunMakeupCameraStream;
+  if (stream) stream.getTracks().forEach(track => track.stop());
+  if (stage) stage._youngsunMakeupStream = null;
+  if (window._youngsunMakeupCameraStream === stream) window._youngsunMakeupCameraStream = null;
+
+  const scope = stage || document;
+  const detail = scope.querySelector?.('[data-youngsun-detail="makeup"]');
+  const video = detail?.querySelector('[data-makeup-video]');
+  if (video) video.srcObject = null;
+  detail?.classList.remove('is-camera-live');
+}
+
+window.stopYoungsunMakeupCamera = stopYoungsunMakeupCamera;
 
 function initYoungsunTtoriInteraction(stage) {
   const detail = stage.querySelector('[data-youngsun-detail="ttori"]');
