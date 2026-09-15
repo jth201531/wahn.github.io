@@ -487,15 +487,21 @@ const cursor = document.getElementById('cursor');
       pageArtist.dataset.display = a.display || '';
       pageArtist.classList.add('visible');
       pageArtist.scrollTop = 0;
-      if (a.display === 'b') {
+      if (a.theme === 'dark') {
         pageArtist.style.background = '#000';
         pageArtist.style.color = '#fff';
         document.getElementById('header-artist-name').style.color = '#fff';
         document.getElementById('artist-meta').style.color = 'rgba(255,255,255,0.5)';
         document.querySelector('.back-btn').style.color = 'rgba(255,255,255,0.5)';
         document.querySelector('.artist-page-header').style.borderColor = 'rgba(255,255,255,0.1)';
+      } else {
+        pageArtist.style.background = 'var(--bg)';
+        pageArtist.style.color = '';
+        document.getElementById('header-artist-name').style.color = '';
+        document.getElementById('artist-meta').style.color = '';
+        document.querySelector('.back-btn').style.color = '';
+        document.querySelector('.artist-page-header').style.borderColor = '';
       }
-      if (a.display !== 'b') pageArtist.style.background = 'var(--bg)';
       if (typeof a.init === 'function') a.init();
     }
 

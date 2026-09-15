@@ -858,6 +858,11 @@
   
     }
 
+    .display-b.soeun-main-page {
+      min-height: calc(100vh - 92px);
+      padding: 0;
+    }
+
 
     .display-e {
       position: fixed;
