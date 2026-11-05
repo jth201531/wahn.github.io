@@ -34,6 +34,7 @@ const cursor = document.getElementById('cursor');
      'youngsun/makeup_following/makeup_01_keyed.png',
      'youngsun/makeup_following/makeup_01.png',
      'youngsun/makeup_following/makeup_02.png',
+     ...Array.from({ length: 17 }, (_, index) => `soeun/애니메이션/${index + 1}.PNG`),
      'minseo/work1.png', 'minseo/work2.png', 'minseo/work3.png', 'minseo/work4.png', 'minseo/work5.png'
     ].forEach(src => {
       const img = new Image();
@@ -520,6 +521,7 @@ function resetArtistHeaderControls() {
 
 function closeArtist() {
   if (window._soeunCanvas) { window._soeunCanvas._remove(); window._soeunCanvas = null; }
+  if (window._soeunAnimation) { window._soeunAnimation._remove(); window._soeunAnimation = null; }
   if (window._fliesAbort) { window._fliesAbort.abort(); window._fliesAbort = null; }
   if (window._youngsunEditorAbort) { window._youngsunEditorAbort.abort(); window._youngsunEditorAbort = null; }
   if (typeof window.stopYoungsunMakeupCamera === 'function') window.stopYoungsunMakeupCamera();
