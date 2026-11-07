@@ -21,7 +21,7 @@ function createRecordCarousel(stage, artists, onSelect, hiddenDisplays = new Set
   const visibleArtists = artists
     .map((artist, artistIndex) => ({ artist, artistIndex }))
     .filter(entry => !hiddenDisplays.has(entry.artist.display));
-  const entries = Array.from({ length: visibleArtists.length + 10 }, () => null);
+  const entries = Array.from({ length: visibleArtists.length + 20 }, () => null);
   visibleArtists.forEach((entry, index) => {
     entries[Math.floor(index * entries.length / visibleArtists.length)] = entry;
   });
@@ -108,7 +108,8 @@ function createRecordCarousel(stage, artists, onSelect, hiddenDisplays = new Set
     const width = stage.clientWidth;
     const height = stage.clientHeight;
     const mobile = width < 760;
-    radius = Math.max(mobile ? 260 : 410, entries.length * (mobile ? 20 : 28));
+    // Keep record size and camera framing independent of the number of records.
+    radius = mobile ? 260 : 410;
     const size = mobile ? 235 : 310;
     stage.style.setProperty('--orbit-record-size', `${size}px`);
     camera.aspect = width / Math.max(1, height);
