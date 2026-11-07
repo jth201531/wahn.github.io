@@ -137,6 +137,8 @@
 .orbit-back .record-postit {
   left: auto;
   right: 6%;
+  align-items: flex-end;
+  text-align: right;
 }
 .record-postit::before {
   content: none;
