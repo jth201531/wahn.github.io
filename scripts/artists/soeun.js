@@ -12,7 +12,7 @@ window.artists.push({
   init: initSoeun
 });
 
-const SOEUN_ANIMATION_DIR = 'soeun/애니메이션';
+const SOEUN_ANIMATION_DIR = 'soeun/animation';
 const SOEUN_ANIMATION_FRAMES = Array.from({ length: 17 }, (_, index) => `${SOEUN_ANIMATION_DIR}/${index + 1}.PNG`);
 
 function initSoeun() {

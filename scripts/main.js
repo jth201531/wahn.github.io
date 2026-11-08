@@ -27,7 +27,7 @@ document.addEventListener('mouseover', event => {
  'youngsun/makeup_following/makeup_01_keyed.png',
  'youngsun/makeup_following/makeup_01.png',
  'youngsun/makeup_following/makeup_02.png',
- ...Array.from({ length: 17 }, (_, index) => `soeun/애니메이션/${index + 1}.PNG`),
+ ...Array.from({ length: 17 }, (_, index) => `soeun/animation/${index + 1}.PNG`),
  'minseo/work1.png', 'minseo/work2.png', 'minseo/work3.png', 'minseo/work4.png', 'minseo/work5.png'
 ].forEach(src => { const image = new Image(); image.src = src; });
 
