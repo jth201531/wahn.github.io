@@ -9,11 +9,32 @@ window.artists.push({
   html: `<div class="display-b soeun-main-page" aria-label="박소은 메인 영역">
     <canvas class="soeun-animation-canvas" data-soeun-animation></canvas>
   </div>`,
-  init: initSoeun
+  init: initSoeun,
+  preload: preloadSoeunAnimation
 });
 
 const SOEUN_ANIMATION_DIR = 'soeun/animation';
-const SOEUN_ANIMATION_FRAMES = Array.from({ length: 17 }, (_, index) => `${SOEUN_ANIMATION_DIR}/${index + 1}.PNG`);
+const SOEUN_ANIMATION_FRAMES = Array.from({ length: 17 }, (_, index) => `${SOEUN_ANIMATION_DIR}/${index + 1}.webp`);
+const soeunFrameLoads = new Map();
+
+function loadSoeunFrame(src) {
+  if (soeunFrameLoads.has(src)) return soeunFrameLoads.get(src);
+  const promise = new Promise((resolve, reject) => {
+    const image = new Image();
+    image.decoding = 'async';
+    image.fetchPriority = src === SOEUN_ANIMATION_FRAMES[0] ? 'high' : 'auto';
+    image.onload = () => image.decode().then(() => resolve(image), reject);
+    image.onerror = () => reject(new Error(`Unable to load ${src}`));
+    image.src = src;
+  });
+  soeunFrameLoads.set(src, promise);
+  promise.catch(() => soeunFrameLoads.delete(src));
+  return promise;
+}
+
+function preloadSoeunAnimation() {
+  return Promise.all(SOEUN_ANIMATION_FRAMES.map(loadSoeunFrame));
+}
 
 function initSoeun() {
   if (window._soeunCanvas) {
@@ -35,12 +56,14 @@ function initSoeun() {
   const naturalWidth = 834;
   const naturalHeight = 1194;
   let frameId = 0;
-  let startTime = 0;
+  let playbackTime = 0;
+  let lastRenderTime = 0;
   let dpr = 1;
   let width = 1;
   let height = 1;
   let removed = false;
-  let images = [];
+  const images = new Array(SOEUN_ANIMATION_FRAMES.length);
+  let availableFrames = 0;
 
   function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
@@ -60,15 +83,6 @@ function initSoeun() {
     canvas.width = Math.round(width * dpr);
     canvas.height = Math.round(height * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  }
-
-  function loadFrame(src) {
-    return new Promise((resolve, reject) => {
-      const image = new Image();
-      image.onload = () => resolve(image);
-      image.onerror = reject;
-      image.src = src;
-    });
   }
 
   function drawFrame(image, alpha, progress) {
@@ -108,16 +122,24 @@ function initSoeun() {
 
   function render(now) {
     if (removed) return;
-    if (!startTime) startTime = now;
+    const delta = lastRenderTime ? Math.min(now - lastRenderTime, 100) : 0;
+    lastRenderTime = now;
 
     ctx.clearRect(0, 0, width, height);
-    if (!images.length) {
+    if (!images[0]) {
       frameId = requestAnimationFrame(render);
       return;
     }
 
-    const elapsed = now - startTime;
-    const rawProgress = clamp((elapsed - holdMs) / travelMs, 0, 1);
+    const nextTime = playbackTime + delta;
+    const nextRawProgress = clamp((nextTime - holdMs) / travelMs, 0, 1);
+    const nextPosition = easeInOutCubic(nextRawProgress) * (images.length - 1);
+    const nextIndex = Math.min(images.length - 2, Math.floor(nextPosition));
+    // Keep motion paused until the next frames have finished decoding.
+    if (nextRawProgress === 0 || nextIndex + 1 < availableFrames) {
+      playbackTime = nextTime;
+    }
+    const rawProgress = clamp((playbackTime - holdMs) / travelMs, 0, 1);
     const progress = easeInOutCubic(rawProgress);
     const framePosition = progress * (images.length - 1);
     const frameIndex = Math.min(images.length - 2, Math.floor(framePosition));
@@ -140,11 +162,11 @@ function initSoeun() {
   window.addEventListener('resize', resize);
   frameId = requestAnimationFrame(render);
 
-  Promise.all(SOEUN_ANIMATION_FRAMES.map(loadFrame)).then(loadedImages => {
+  Promise.all(SOEUN_ANIMATION_FRAMES.map((src, index) => loadSoeunFrame(src).then(image => {
     if (removed) return;
-    images = loadedImages;
-    startTime = 0;
-  }).catch(error => {
+    images[index] = image;
+    while (images[availableFrames]) availableFrames++;
+  }))).catch(error => {
     console.warn('Failed to load Soeun animation frames', error);
   });
 

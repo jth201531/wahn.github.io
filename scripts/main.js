@@ -17,20 +17,6 @@ document.addEventListener('mouseover', event => {
   cursor.classList.toggle('hover', Boolean(interactive));
 });
 
-['youngsun/ttori_the_dog/ttori.png',
- 'youngsun/ttori_the_dog/ttori_the_dog.webp',
- 'youngsun/ttori_the_dog/ttori_wall.png',
- 'youngsun/ttori_the_dog/ttori_sit.png',
- 'youngsun/ttori_the_dog/contract.png',
- 'youngsun/makeup_following/makeup_thumb.png',
- 'youngsun/makeup_following/makeup_photo.jpg',
- 'youngsun/makeup_following/makeup_01_keyed.png',
- 'youngsun/makeup_following/makeup_01.png',
- 'youngsun/makeup_following/makeup_02.png',
- ...Array.from({ length: 17 }, (_, index) => `soeun/animation/${index + 1}.PNG`),
- 'minseo/work1.png', 'minseo/work2.png', 'minseo/work3.png', 'minseo/work4.png', 'minseo/work5.png'
-].forEach(src => { const image = new Image(); image.src = src; });
-
 const artists = window.artists || [];
 // Remove a key to restore iAn (a) or Minseo (minseo) on screen.
 const hiddenArtistDisplays = new Set(['a', 'minseo']);
@@ -119,6 +105,9 @@ function openArtistFromRecord(index, element) {
   stage.classList.add('panning');
   document.body.classList.add('artist-transitioning');
   const artist = artists[index];
+  if (typeof artist.preload === 'function') {
+    Promise.resolve(artist.preload()).catch(error => console.warn('Artist preload failed', error));
+  }
   const rect = element.getBoundingClientRect();
   const card = document.createElement('div');
   card.className = 'artist-transition-card';
